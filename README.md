@@ -45,7 +45,7 @@ docker run -t -i lkzhu1/ubuntu:prototype1
 
 ## Documentation
 
-Complete documentation is located at https://neurodatadesign.github.io/seelviz/nojohns/clarity.m.html. 
+Complete documentation is located at https://neurodatadesign.github.io/seelviz//reveal/clarityviz.m.html. 
 
 
 ## Credits
