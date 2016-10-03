@@ -10,6 +10,9 @@ mpl.use('Agg')
 from skimage import data, img_as_float
 from skimage import exposure
 
+import plotly
+import plotly.graph_objs as go
+
 import cv2
 
 import math, os, gc
@@ -46,19 +49,23 @@ class clarityviz(object):
             os.makedirs(token)
 
     def getShape(self):
+        """Function that returns the shape."""
         return self._shape
 
     def getMax(self):
+        """Function that returns the max."""
         return self._max
 
     def discardImg(self):
+        """Function used to get rid of the img in memory."""
         del self._img
         gc.collect()
         return self
 
     def generate_plotly_html(self):
+        """Generates the plotly from the csv file."""
         # Type in the path to your csv file here
-        thedata = np.genfromtxt(self._token + '/' + self._token + '.csv',
+        thedata = np.genfromtxt(self._token + '/' + self._token + 'localeq.csv',
             delimiter=',', dtype='int', usecols = (0,1,2), names=['a','b','c'])
 
         trace1 = go.Scatter3d(
@@ -89,6 +96,7 @@ class clarityviz(object):
         plotly.offline.plot(fig, filename= self._token + "/" + self._token + "plotly.html")
 
     def generateHistogram(self):
+        """Applies local equilization to the img's histogram and outputs a .nii file"""
         print('Generating Histogram...')
         if self._source_directory == None:
             path = self._token + '.img'
@@ -143,28 +151,29 @@ class clarityviz(object):
         localeq = nib.Nifti1Image(newer_img, np.eye(4))
         nib.save(localeq, self._token + '/' + self._token + 'localeq.nii')
 
-    def loadImg(self, path=None, info=False):
-        """Method for loading the .img file"""
-#        if path is None:
-#            path = rs.RAW_DATA_PATH
-#        pathname = path + self._token+".img"
-        if self._source_directory == None:
-            path = self._token + '.img'
-        else:
-            path = self._source_directory + "/" + self._token + ".img"
-        
-        #path = self._token + '.hdr'
-
-        img = nib.load(path)
-        if info:
-            print(img)
-        self._img = img.get_data()[:,:,:,0]
-        self._shape = self._img.shape
-        self._max = np.max(self._img)
-        print("Image Loaded: %s"%(path))
-        return self
+#    def loadImg(self, path=None, info=False):
+#        """Method for loading the .img file"""
+##        if path is None:
+##            path = rs.RAW_DATA_PATH
+##        pathname = path + self._token+".img"
+#        if self._source_directory == None:
+#            path = self._token + '.img'
+#        else:
+#            path = self._source_directory + "/" + self._token + ".img"
+#        
+#        #path = self._token + '.hdr'
+#
+#        img = nib.load(path)
+#        if info:
+#            print(img)
+#        self._img = img.get_data()[:,:,:,0]
+#        self._shape = self._img.shape
+#        self._max = np.max(self._img)
+#        print("Image Loaded: %s"%(path))
+#        return self
     
     def loadEqImg(self, path=None, info=False):
+        """Function for loading the img.""" 
         print('Inside loadEqImg')
         if self._source_directory == None:
             path = self._token + '.img'
@@ -183,26 +192,8 @@ class clarityviz(object):
         return self
 
     def loadGeneratedNii(self, path=None, info=False):
+        """Loads a preexisting nii file.  This function is mainly used for testing"""
         path = self._token + '/' + self._token + 'localeq.nii'
-        print("Loading: %s"%(path))
-
-        #pathname = path+self._token+".nii"
-        img = nib.load(path)
-        if info:
-            print(img)
-        #self._img = img.get_data()[:,:,:,0]
-        self._img = img.get_data()
-        self._shape = self._img.shape
-        self._max = np.max(self._img)
-        print("Image Loaded: %s"%(path))
-        return self
-
-
-    def loadNii(self, path=None, info=False):
-        if self._source_directory == None:
-            path = self._token + '.nii'
-        else:
-            path = self._source_directory + "/" + self._token + ".nii"
         print("Loading: %s"%(path))
 
         #pathname = path+self._token+".nii"
@@ -250,7 +241,12 @@ class clarityviz(object):
         print("(This will take couple minutes)")
         # threshold
         filt = self._img > threshold * self._max
-        x, y, z = np.where(filt)
+        # a is just a container to hold another value for ValueError: too many values to unpack
+        #x, y, z, a = np.where(filt)
+        t = np.where(filt)
+        x = t[0]
+        y = t[1]
+        z = t[2]
         v = self._img[filt]
         if optimize:
             self.discardImg()
@@ -271,10 +267,11 @@ class clarityviz(object):
         return self
 
     def savePoints(self,path=None):
+        """Saves the points to a file"""
         if self._points is None:
             raise ValueError("Points is empty, please call imgToPoints() first.")
 
-        pathname = self._token + "/" + self._token+".csv"
+        pathname = self._token + "/" + self._token+"localeq.csv"
         np.savetxt(pathname,self._points,fmt='%d',delimiter=',')
         return self
 
@@ -377,36 +374,6 @@ class clarityviz(object):
 
             outfile.write("  </graph>\n</graphml>")
 
-    def graphmlToPlotly(self, path):
-        ## Type in the path to your csv file here
-        thedata = np.genfromtxt('../data/points/localeq.csv', delimiter=',', dtype='int', usecols = (0,1,2), names=['a','b','c'])
-
-        trace1 = go.Scatter3d(
-            x = thedata['a'],
-            y = thedata['b'],
-            z = thedata['c'],
-            mode='markers',
-            marker=dict(
-                size=1.2,
-                color='purple',                # set color to an array/list of desired values
-                colorscale='Viridis',   # choose a colorscale
-                opacity=0.15
-            )
-        )
-
-        data = [trace1]
-        layout = go.Layout(
-            margin=dict(
-                l=0,
-                r=0,
-                b=0,
-                t=0
-            )
-        )
-            
-        fig = go.Figure(data=data, layout=layout)
-        print("localeq")
-        plotly.offline.plot(fig, filename= "localeq")
 
 
 
