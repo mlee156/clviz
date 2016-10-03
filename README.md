@@ -15,10 +15,11 @@ cd clviz
 pip install -r requirements.txt
 ```
 
-Afterwards install opencv. This is easily accomplishable if you have brew or conda by either using:
+Afterwards install opencv. This is easily accomplishable if you have brew or conda by using either
  ```
  brew install opencv
  ```
+ or
  ```
  conda install opencv
  ```
