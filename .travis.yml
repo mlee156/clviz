@@ -1,7 +1,13 @@
+sudo: required
 language: python
 python:
   - "2.7"
 # command to install dependencies
-install: "pip install -r requirements.txt"
+install: 
+"sudo apt-get install libopencv-dev python-opencv"
+"sudo apt-get autoremove libopencv-dev python-opencv"
+"wget 'https://github.com/milq/scripts-ubuntu-debian/blob/master/install-opencv.sh'"
+"pip install -r requirements.txt"
 # command to run tests
-script: nosetests
+script:
+"bash install-opencv.sh"
