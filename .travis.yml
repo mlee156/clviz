@@ -6,7 +6,7 @@ python:
 install: 
 - wget 'https://github.com/milq/scripts-ubuntu-debian/blob/master/install-opencv.sh'
 - sudo apt-get install libopencv-dev python-opencv
-- sudo apt-get autoremove libopencv-dev python-opencv"
+- sudo apt-get autoremove libopencv-dev python-opencv
 - pip install -r requirements.txt
 # command to run tests
 script: 
