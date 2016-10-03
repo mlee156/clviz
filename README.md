@@ -15,6 +15,10 @@ cd clviz
 pip install -r requirements.txt
 ```
 
+After installing the prerequisites there's two options for using clviz. You can use clviz as a standalone package and
+perform basic analysis on your own files, or you can install ndreg and ndio and use clviz as a powerful integrating tool
+for graph-based analysis.
+
 ```
 pip install clarityviz
 ```
