@@ -36,7 +36,7 @@ pip install clarityviz
 ## Getting Started
 
 
-## Contributing
-
 
 ## Documentation
+
+Complete documentation is located at https://neurodatadesign.github.io/seelviz/nojohns/clarity.m.html. 
