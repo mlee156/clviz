@@ -46,7 +46,7 @@ cd build
 cmake -DWITH_QT=ON -DWITH_OPENGL=ON -DFORCE_VTK=ON -DWITH_TBB=ON -DWITH_GDAL=ON -DWITH_XINE=ON -DBUILD_EXAMPLES=ON ..
 make -j4
 sudo make install -y
-sudo ldconfig
+sudo ldconfig -y
 
 
 # EXECUTE SOME OPENCV EXAMPLES AND COMPILE A DEMONSTRATION
