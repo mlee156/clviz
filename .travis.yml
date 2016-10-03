@@ -4,7 +4,7 @@ python:
   - "2.7"
 # command to install dependencies
 install: 
-- wget 'https://github.com/milq/scripts-ubuntu-debian/blob/master/install-opencv.sh'
+- wget 'https://raw.githubusercontent.com/milq/scripts-ubuntu-debian/master/install-opencv.sh'
 - sudo apt-get install libopencv-dev python-opencv
 - sudo apt-get autoremove libopencv-dev python-opencv
 - pip install -r requirements.txt
