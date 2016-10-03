@@ -45,3 +45,10 @@ docker pull lkzhu1/ubuntu:prototype1
 ## Documentation
 
 Complete documentation is located at https://neurodatadesign.github.io/seelviz/nojohns/clarity.m.html. 
+
+
+## Credits
+
+Credit to installation script in .travis.yml goes to https://github.com/milq/scripts-ubuntu-debian.
+
+
