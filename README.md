@@ -34,8 +34,9 @@ pip install clarityviz
 ```
 
 ## Docker Installation
+```
 docker pull lkzhu1/ubuntu:prototype1
-
+```
 
 ## Getting Started
 
