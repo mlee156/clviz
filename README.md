@@ -8,6 +8,13 @@
 
 ## Installation
 
+To install the prerequisite packages, clone the directory using:
+```
+git clone https://github.com/alee156/clviz.git
+cd clviz
+pip install -r requirements.txt
+```
+
 ```
 pip install clarityviz
 ```
