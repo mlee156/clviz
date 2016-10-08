@@ -3,7 +3,9 @@ MANIFEST.in
 setup.cfg
 setup.py
 clarityviz/__init__.py
-clarityviz/clarityviz.py
+clarityviz/atlasregiongraph.py
+clarityviz/claritybase.py
+clarityviz/densitygraph.py
 clarityviz.egg-info/PKG-INFO
 clarityviz.egg-info/SOURCES.txt
 clarityviz.egg-info/dependency_links.txt

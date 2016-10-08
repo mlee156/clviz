@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: clarityviz
-Version: 0.0.1
+Version: 0.0.4
 Summary: A pipeline used to vizualize clarity treated brain images.
 Home-page: https://github.com/NeuroDataDesign/seelviz
 Author: Albert Lee, Jonathan Liu, Tony Sun, Luke Zhu
