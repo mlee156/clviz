@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # KEEP UBUNTU OR DEBIAN UP TO DATE
 
 apt-get -y update
