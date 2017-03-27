@@ -23,3 +23,10 @@
 ### Improved
 - changed from a more object oriented approach to a more scripting approach
 - instead of using mainly csv's to store nodes and edges, it now uses networkx and graphml's
+
+# 0.1.1
+
+3/17/17
+
+### Improved
+- fixed imports by removing jupyter notebook inline stuff
