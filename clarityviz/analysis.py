@@ -14,7 +14,7 @@ from plotly.graph_objs import *
 from plotly.offline import download_plotlyjs, init_notebook_mode, iplot
 from plotly import tools
 
-plotly.offline.init_notebook_mode()
+# plotly.offline.init_notebook_mode()
 
 import time
 import collections as col

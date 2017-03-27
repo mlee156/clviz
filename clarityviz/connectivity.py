@@ -35,7 +35,7 @@ from sklearn.manifold import spectral_embedding as se
 
 import scipy.sparse as sp
 
-plotly.offline.init_notebook_mode()
+# plotly.offline.init_notebook_mode()
 
 def spec_clust(graphx, num_components):
     """
