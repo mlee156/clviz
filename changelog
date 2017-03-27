@@ -1,3 +1,25 @@
-9/29/16 - initial commit
+# clarityviz changelog
 
-10/8/16 - added graphdensity and fixed some bugs
+## 0.0.1
+
+9/29/16
+
+- initial commit
+
+## 0.0.6
+
+10/8/16
+
+### Added
+- graphdensity
+
+### Improved
+- made some bug fixes
+
+# 0.1.0
+
+3/17/17
+
+### Improved
+- changed from a more object oriented approach to a more scripting approach
+- instead of using mainly csv's to store nodes and edges, it now uses networkx and graphml's

@@ -1,5 +1,4 @@
-from claritybase import claritybase
-from densitygraph import densitygraph
-from atlasregiongraph import atlasregiongraph
+import analysis
+import connectivity
 
-version = "0.0.4"
+version = "0.1.0"
