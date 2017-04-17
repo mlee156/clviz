@@ -8,6 +8,13 @@ import pickle
 
 import clarityviz as clv
 
+import zipfile
+
+def zipdir(path, ziph):
+    # ziph is zipfile handle
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            ziph.write(os.path.join(root, file))
 
 # def s3_push_data(bucket, remote, outDir, modifier, creds=True):
 #     cmd = 'aws s3 cp --exclude "tmp/*" {} s3://{}/{}/{} --recursive --acl public-read'
@@ -45,6 +52,10 @@ def main():
     args = get_args()
 
     clv.analysis.run_pipeline(args.token, 'userToken.pem', args.resolution)
+
+    zipf = zipfile.ZipFile('output.zip', 'w', zipfile.ZIP_DEFLATED)
+    zipdir('output/', zipf)
+    zipf.close()
 
 if __name__ == "__main__":
     main()
