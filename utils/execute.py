@@ -6,8 +6,6 @@ import argparse
 import sys
 import pickle
 
-import ndmg.utils as mgu
-
 import clarityviz as clv
 
 
