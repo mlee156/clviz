@@ -6,9 +6,19 @@ import argparse
 import sys
 import pickle
 
+import boto3
+from argparse import ArgumentParser
+import csv
+import sys
+
 import clarityviz as clv
 
 import zipfile
+
+def uploadS3(bucket, data, public_access_key, secret_access_key):
+    s3 = boto3.client('s3', aws_access_key_id=public_access_key, aws_secret_access_key=secret_access_key)
+    s3.upload_file(data, bucket, data)
+
 
 def zipdir(path, ziph):
     # ziph is zipfile handle
@@ -56,6 +66,21 @@ def main():
     zipf = zipfile.ZipFile('output.zip', 'w', zipfile.ZIP_DEFLATED)
     zipdir('output/', zipf)
     zipf.close()
+
+    bucket = 'batchdemo'
+    # credentials = str(result.credentials)
+    data = 'output.zip'
+
+    credfile = open('access.csv', 'rb')
+    reader = csv.reader(credfile)
+    rowcounter = 0
+    for row in reader:
+        if rowcounter == 1:
+            public_access_key = str(row[0])
+            secret_access_key = str(row[1])
+        rowcounter = rowcounter + 1
+
+    uploadS3(bucket, data, public_access_key, secret_access_key)
 
 if __name__ == "__main__":
     main()
