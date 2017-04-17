@@ -9,13 +9,13 @@ import pickle
 import clarityviz as clv
 
 
-def s3_push_data(bucket, remote, outDir, modifier, creds=True):
-    cmd = 'aws s3 cp --exclude "tmp/*" {} s3://{}/{}/{} --recursive --acl public-read'
-    cmd = cmd.format(outDir, bucket, remote, modifier)
-    if not creds:
-        print("Note: no credentials provided, may fail to push big files.")
-        cmd += ' --no-sign-request'
-    mgu.execute_cmd(cmd)
+# def s3_push_data(bucket, remote, outDir, modifier, creds=True):
+#     cmd = 'aws s3 cp --exclude "tmp/*" {} s3://{}/{}/{} --recursive --acl public-read'
+#     cmd = cmd.format(outDir, bucket, remote, modifier)
+#     if not creds:
+#         print("Note: no credentials provided, may fail to push big files.")
+#         cmd += ' --no-sign-request'
+#     mgu.execute_cmd(cmd)
 
 def get_args():
     parser = argparse.ArgumentParser(description="This is the script to run the pipeline.")
