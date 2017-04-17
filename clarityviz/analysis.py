@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-# -*- coding:utf-8 -*-
+#-*- coding:utf-8 -*-
 
 import matplotlib
 from matplotlib import pyplot as plt
 import numpy as np
 from numpy import linalg as LA
 import cv2
+from skimage import exposure
 import math
 import os
 
@@ -13,7 +14,6 @@ import plotly
 from plotly.graph_objs import *
 from plotly.offline import download_plotlyjs, init_notebook_mode, iplot
 from plotly import tools
-
 # plotly.offline.init_notebook_mode()
 
 import time
@@ -39,9 +39,21 @@ from sklearn.manifold import spectral_embedding as se
 
 import scipy.sparse as sp
 
+original_spacing = ();
 
-def get_raw_brain(inToken, save=False, output_path=None):
-    inImg = imgDownload(inToken, resolution=5)
+def get_raw_brain(inToken, cert_path, resolution=5, save=False, output_path=None):
+    """
+    Gets raw brain from inToken from NeuroData servers (must be valid token).
+    :param inToken: The token for the brain of interest, from NeuroData.
+    :param cert_path: "/cis/project/clarity/code/ndreg/userToken.pem" Path to the pem certificate.
+    :param save: Boolean that determines whether to save a local copy, defaults to false
+    :param output_path: Path to save the local brain image, defaults to none.
+    :return inImg: The brain image of interest.
+    """
+    server = "dev.neurodata.io"
+    userToken = txtRead(cert_path).strip()
+    
+    inImg = imgDownload(inToken, resolution=5, server=server, userToken=userToken)
     # Saving raw image
     if output_path == None:
         output_path = inToken + "_raw.nii"
@@ -50,35 +62,122 @@ def get_raw_brain(inToken, save=False, output_path=None):
 
     return inImg
 
+def get_atlas(cert_path, save=False, output_path=None):
+    """
+    Gets average channel atlas from NeuroData servers (defaults to ara3).
+    :param save: Boolean that determines whether to save a local copy, defaults to false
+    :param cert_path: "/cis/project/clarity/code/ndreg/userToken.pem" Path to the pem certificate.
+    :param output_path: Path to save a copy of the atlas image, defaults to none.
+    :return refImg: The average atlas image.
+    """
+    refToken = "ara3"
+    server = "dev.neurodata.io"
+    userToken = txtRead(cert_path).strip()
 
-def get_atlas(save=False, output_path=None):
-    refToken = "ara_ccf2"
-    refImg = imgDownload(refToken)
+    refImg = imgDownload(refToken, channel="average", server=server, userToken=userToken)
     # Saving annotations
     if output_path == None:
-        output_path = "ara_ccf2.nii"
+        output_path = "atlas/ara3_average.nii"
     if save:
         imgWrite(refImg, str(output_path))
     return refImg
 
+def get_atlas_annotate(cert_path, save=False, output_path=None):
+    """
+    Gets annotation channel atlas from NeuroData servers (defaults to ara3).
+    :param save: Boolean that determines whether to save a local copy, defaults to false
+    :param cert_path: "/cis/project/clarity/code/ndreg/userToken.pem" Path to the pem certificate.
+    :param output_path: Path to save a copy of the annotation atlas image, defaults to none.
+    :return refImg: The annotation atlas image.
+    """
+    refToken = "ara3"
+    server = "dev.neurodata.io"
+    userToken = txtRead(cert_path).strip()
 
-def register(token, orientation, resolution=5, raw_im=None, atlas=None):
+    refImg = imgDownload(refToken, channel="annotation", server=server, userToken=userToken)
+    # Saving annotations
+    if output_path == None:
+        output_path = "atlas/ara3_annotation.nii"
+    if save:
+        imgWrite(refImg, str(output_path))
+    return refImg
+
+def get_registered(token, cert_path):
+    """
+    Gets a copy of the already-registered brain from the NeuroData servers.  This is the equivalent of the inAnnoImg
+    that Kwame uploads after he completes registration.  Must be on this list: https://dev.neurodata.io/nd/ca/public_tokens/
+    :param token: The token for the registered brain of interest.
+    :param cert_path: Certification path for access to NeuroData.
+    :return inAnnoImg: The SITK image of inAnnoImg that results after LDDMM. 
+    """
+    
+    # Load certification and server details
+    registeredToken = token;
+    server = "dev.neurodata.io";
+    userToken = txtRead(cert_path).strip()
+    
+    print("Getting registered brain from server...");
+    
+    download = imgDownload(registeredToken, server=server, userToken=userToken);
+    
+    print("Saving local copy of registered brain...");
+    
+    # Saving registered image
+    location = "img/" + token + "_regis.nii"
+    imgWrite(download, str(location));
+    
+    return download;
+
+def get_spacing_registered(filepath):
+    imgLoad = sitk.ReadImage(filepath);
+    global original_spacing;
+    original_spacing = original_spacing + imgLoad.GetSpacing();
+
+def register(token, cert_path, orientation, resolution=5, raw_im=None, atlas=None, annotate=None):
     """
     Saves fully registered brain as token + '_regis.nii' and annotated atlas as '_anno.nii'.
     :param token: The token for the brain of interest.
+    :param cert_path: Certification path
     :param orientation: The orientation of the brain (e.g. LSA, RPS).
     :param resolution: Desired resolution of the image (1 - 5).
+    :param raw_im: Defaults to None, can take a copy of a brain image from get_raw_brain.
+    :param atlas: Defaults to None, can take a copy of the atlas reference image ("average" channel).
+    :param annotate: Defaults to None, can take a copy of the atlas annotated image ("annotated" channel).
     :return:
     """
-    refToken = "ara_ccf2"
-    refImg = imgDownload(refToken)
+    
+    # Load certification and find raw atlas/annotated channel/raw data
+    refToken = "ara3"
+    server = "dev.neurodata.io"
+    userToken = txtRead(cert_path).strip()
 
-    if atlas == None:
-        refAnnoImg = imgDownload(refToken, channel="annotation")
-
+    print("Getting data from server...");
+    
     if raw_im == None:
-        inImg = imgDownload(token, resolution=resolution)
+        inImg = imgDownload(token, resolution=resolution, server=server, userToken=userToken)
+    else:
+        inImg = raw_im;
+    
+    if atlas == None:
+        refImg = imgDownload(refToken, channel="average", server=server, userToken=userToken)
+    else:
+        refImg = atlas;
+    
+    if annotate == None:
+        refAnnoImg = imgDownload(refToken, channel="annotation", server=server, userToken=userToken)
+    else:
+        refAnnoImg = annotate;
+        
+    print inImg.GetSize();
+    print refImg.GetSize();
 
+    global original_spacing;
+    original_spacing = original_spacing + inImg.GetSpacing();
+
+    inImg.SetSpacing(np.array(inImg.GetSpacing())*1000) ### wtf??
+
+    print("Finished data acquisition...");
+    
     # resampling CLARITY image
     inImg = imgResample(inImg, spacing=refImg.GetSpacing())
 
@@ -90,18 +189,20 @@ def register(token, orientation, resolution=5, raw_im=None, atlas=None):
 
     counts = np.bincount(values)
     maximum = np.argmax(bins)
-    # print(maximum)
-    # print(counts)
+    print(maximum)
+    print(counts)
 
     lowerThreshold = maximum
     upperThreshold = sitk.GetArrayFromImage(inImg).max() + 1
 
-    # print(lowerThreshold)
-    # print(upperThreshold)
+    print("lower and upper thresholds:");
+    print(lowerThreshold)
+    print(upperThreshold)
 
     inImg = sitk.Threshold(inImg, lowerThreshold, upperThreshold, lowerThreshold) - lowerThreshold
 
     # Generating CLARITY mask
+    print("Begin CLARITY mask generation...");
     (values, bins) = np.histogram(sitk.GetArrayFromImage(inImg), bins=1000)
     cumValues = np.cumsum(values).astype(float)
     cumValues = (cumValues - cumValues.min()) / cumValues.ptp()
@@ -112,12 +213,16 @@ def register(token, orientation, resolution=5, raw_im=None, atlas=None):
     inMask = sitk.BinaryThreshold(inImg, 0, threshold, 1, 0)
 
     # Affine Transformation
-    spacing = [0.25, 0.25, 0.25]
+    print("Begin affine transformation...");
+    spacing = [0.1, 0.1, 0.1]
     refImg_ds = imgResample(refImg, spacing=spacing)
 
     inImg_ds = imgResample(inImg, spacing=spacing)
 
     inMask_ds = imgResample(inMask, spacing=spacing, useNearest=True)
+    
+    print inImg_ds.GetSize()
+    print refImg_ds.GetSize()
 
     affine = imgAffineComposite(inImg_ds, refImg_ds, inMask=inMask_ds, iterations=100, useMI=True, verbose=True)
 
@@ -126,6 +231,7 @@ def register(token, orientation, resolution=5, raw_im=None, atlas=None):
     inMask_affine = imgApplyAffine(inMask, affine, size=refImg.GetSize(), useNearest=True)
 
     # LDDMM Registration
+    print("Begin LDDMM...");
     inImg_ds = imgResample(inImg_affine, spacing=spacing)
     inMask_ds = imgResample(inMask_affine, spacing=spacing, useNearest=True)
     (field, invField) = imgMetamorphosisComposite(inImg_ds, refImg_ds, inMask=inMask_ds, alphaList=[0.05, 0.02, 0.01],
@@ -140,9 +246,11 @@ def register(token, orientation, resolution=5, raw_im=None, atlas=None):
     # Saving annotations
     location = "img/" + token + "_anno.nii"
     imgWrite(refAnnoImg, str(location))
-
+    
+    #debugging:
+    print "Completed registration!"
+    
     return inImg_lddmm, refAnnoImg
-
 
 def apply_clahe(input_path):
     """
@@ -160,11 +268,14 @@ def apply_clahe(input_path):
     im_flat = im.reshape(-1)
 
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-
     cl1 = clahe.apply(im_flat)
+    
+    #c11 = exposure.equalize_adapthist(im_flat, clip_limit=2.0);
 
     im_clahe = cl1.reshape(x_value, y_value, z_value)
-
+    #debugging:
+    print "Completed CLAHE!"
+    
     return im_clahe
 
 
@@ -238,13 +349,29 @@ def downsample(im, num_points=10000, optimize=True):
     print("Finished")
     return points
 
-
-def run_pipeline(token, orientation, resolution=5):
-    register(token, orientation, resolution)
-    path = "img/" + token + "_anno.nii"
-    apply_clahe(path)
-    downsample(im, num_points)
-
+def run_pipeline(token, cert_path, resolution=5):
+    """
+    Runs each individual part of the pipeline.
+    :param token: Token name for REGISTERED brains in NeuroData.  (https://dev.neurodata.io/nd/ca/public_tokens/)
+    :param orientation: Orientation of brain in NeuroData (eg: LSA, RSI)
+    :param resolution: Resolution for the brains in NeuroData (from raw image data at resolution 0 to ds levels at resolution 5)
+    """
+    #register(token, cert_path, orientation, resolution)
+    get_registered(token, cert_path);
+    path = "img/" + token + "_regis.nii"  #why _anno?  That's the refAnnoImg...
+    im = apply_clahe(path);
+    output_ds = downsample(im, num_points=10000);
+    save_points(output_ds, "points/" + token + ".csv")
+    points_path = "points/" + token + ".csv";
+    generate_pointcloud(points_path, "output/" + token + "_pointcloud.html");
+    get_atlas_annotate(cert_path, save=True);
+    get_regions(points_path, "atlas/ara3_annotation.nii", "points/" + token + "_regions.csv");
+    points_region_path = "points/" + token + "_regions.csv";
+    g = create_graph(points_region_path, output_filename="graphml/" + token + "_graph.graphml");
+    plot_graphml3d(g, output_path="output/" + token + "_edgegraph.html");
+    generate_region_graph(token, points_region_path, output_path="output/" + token + "_regions.html");
+    generate_density_graph(graph_path="graphml/" + token + "_graph.graphml", output_path="output/" + token + "_density.html", plot_title="False-Color Density of " + token);
+    print("Completed pipeline...!")
 
 def save_points(points, output_path):
     """
@@ -253,42 +380,43 @@ def save_points(points, output_path):
     :param output_path:
     :return:
     """
-    #     pathname = 'points/Fear199.csv"
+    if not os.path.exists('points'):
+        os.makedirs('points')
+#     pathname = 'points/Fear199.csv"
     np.savetxt(output_path, points, fmt='%d', delimiter=',')
 
-
-def generate_pointcloud(points_path, output_path, resolution):
+def generate_pointcloud(points_path, output_path):
     """
-    Generates the plotly scatterplot html file from the csv file."
-    :param points_path:
-    :param output_path:
-    :param resolution:
+    Generates the plotly scatterplot html file from the csv file.
+    :param points_path: Filepath to points csv.
+    :param output_path: Filepath for where to save output html.
+    :param resolution: Resolution for spacing (see openConnecto.me spacing)
     :return:
     """
     # Type in the path to your csv file here
     thedata = None
     thedata = np.genfromtxt(points_path,
-                            delimiter=',', dtype='int', usecols=(0, 1, 2), names=['a', 'b', 'c'])
+        delimiter=',', dtype='int', usecols = (0,1,2), names=['a','b','c'])
 
     # Set tupleResolution to resolution input parameter
-    tupleResolution = resolution;
+    #tupleResolution = resolution;
 
     # EG: for Aut1367, the spacing is (0.01872, 0.01872, 0.005).
-    xResolution = tupleResolution[0]
-    yResolution = tupleResolution[1]
-    zResolution = tupleResolution[2]
+    #xResolution = tupleResolution[0]
+    #yResolution = tupleResolution[1]
+    #zResolution = tupleResolution[2]
     # Now, to get the mm image size, we can multiply all x, y, z
     # to get the proper mm size when plotting.
 
     trace1 = Scatter3d(
-        x=[x * xResolution for x in thedata['a']],
-        y=[x * yResolution for x in thedata['b']],
-        z=[x * zResolution for x in thedata['c']],
+        x = [x for x in thedata['a']], #removed x in xResolution, etc
+        y = [x for x in thedata['b']],
+        z = [x for x in thedata['c']],
         mode='markers',
         marker=dict(
             size=1.2,
-            color='cyan',  # set color to an array/list of desired values
-            colorscale='Viridis',  # choose a colorscale
+            color='cyan',                # set color to an array/list of desired values
+            colorscale='Viridis',   # choose a colorscale
             opacity=0.15
         )
     )
@@ -306,19 +434,21 @@ def generate_pointcloud(points_path, output_path, resolution):
     )
 
     fig = Figure(data=data, layout=layout)
+    
+    if not os.path.exists('output'):
+        os.makedirs('output');
 
     plotly.offline.plot(fig, filename=output_path)
-
 
 #     plotly.offline.plot(fig, filename= 'output/' + self._token + "/" + self._token + "_brain_pointcloud.html")
 
 def get_regions(points_path, anno_path, output_path):
     """
     Function for getting the array of points with region as the fifth column.
-    :param points_path:
-    :param anno_path:
-    :param output_path:
-    :return:
+    :param points_path: File path for the points csv.
+    :param anno_path: File path for the annotations csv.
+    :param output_path: Output file path for where to save the regions csv.
+    :return: Array with additional 5th column being the region IDs.
     """
     atlas = nib.load(anno_path)  # <- atlas .nii image
     atlas_data = atlas.get_data()
@@ -339,14 +469,12 @@ def get_regions(points_path, anno_path, output_path):
     infile.close()
     outfile.close()
 
-    print
-    len(regions)
+    print len(regions)
     #     print regions[0:10]
     uniq = list(set(regions))
     numRegions = len(uniq)
     print('num unique regions: %d' % len(uniq))
-    print
-    uniq
+    print uniq
 
     p = np.genfromtxt(output_path, delimiter=',')
     return p
@@ -369,7 +497,7 @@ def create_graph(points_path, radius=20, output_filename=None):
         #         if i % 3000 == 0:
         #             print('ahhh: %d' % i)
         coordi = points[i][0:3]
-        intensityi, regioni = points[i][3:5]
+        intensityi, regioni = points[i][3:5];
         # save node name as string because when loading from .graphml file, it's hard to load tuple names
         namei = str(list(coordi))
         g.add_node(namei)
@@ -397,11 +525,13 @@ def create_graph(points_path, radius=20, output_filename=None):
 
     print('finished creating graph, now about to save to graphml.')
 
+    if not os.path.exists('graphml'):
+        os.makedirs('graphml');
+    
     if output_filename != None:
         nx.write_graphml(g, output_filename)
 
     return g
-
 
 def plot_graphml3d(g, show=False, output_path=None):
     """
@@ -410,7 +540,7 @@ def plot_graphml3d(g, show=False, output_path=None):
     # grab the node positions from the graphML file
     V = nx.number_of_nodes(g)
     attributes = nx.get_node_attributes(g, 'coord')
-    #     nodes = g.nodes()
+#     nodes = g.nodes()
     node_positions_3d = pd.DataFrame(columns=['x', 'y', 'z'], index=range(V))
     i = 0
     for key, val in enumerate(attributes):
@@ -422,7 +552,7 @@ def plot_graphml3d(g, show=False, output_path=None):
     edge_x = []
     edge_y = []
     edge_z = []
-
+    
     for e in g.edges():
         # Changing tuple to list
         source_pos = ast.literal_eval(g.node[e[0]]['coord'])
@@ -479,7 +609,7 @@ def plot_graphml3d(g, show=False, output_path=None):
     fig = Figure(data=data, layout=layout)
     if show:
         iplot(fig, validate=False)
-
+    
     if output_path != None:
         plotly.offline.plot(fig, filename=output_path)
 
@@ -513,8 +643,14 @@ def generate_region_graph(token, points_path, output_path=None):
     # Now, to get the mm image size, we can multiply all x, y, z
     # to get the proper mm size when plotting.
 
-    """Load the CSV of the ARA with CCF v2 (see here for docs:)"""
-    ccf_txt = 'natureCCFOhedited.csv'
+    """
+    Load the CSV of the ARA with CCF v3: in order to generate this we use the ARA API.
+    We can download a csv using the following URL:
+    http://api.brain-map.org/api/v2/data/query.csv?criteria=model::Structure,rma::criteria,[ontology_id$eq1],rma::options[order$eq%27structures.graph_order%27][num_rows$eqall]
+    
+    Note the change of ontology_id$eq27 to ontology_id$eq1 to get the brain atlas.
+    """
+    ccf_txt = 'latest_ccf3_csv.csv'
 
     ccf = {}
     with open(ccf_txt, 'rU') as csvfile:
@@ -594,10 +730,8 @@ def generate_region_graph(token, points_path, output_path=None):
 
     #     print "All unique specific region ID's:"
     #     print allUniqueSpecific
-    print
-    "Total number of unique ID's:"
-    print
-    numRegionsASpecific  ## number of regions
+    print "Total number of unique ID's:"
+    print numRegionsASpecific  ## number of regions
 
     # Store and count the bright regions in each unique region (new)
     dictNumElementsRegionSpecific = {}
@@ -605,14 +739,20 @@ def generate_region_graph(token, points_path, output_path=None):
 
     for i in range(numRegionsASpecific):
         counter = 0;
+        
         for l in specificRegions:
-            if l[3] == allUniqueSpecific[i]:
-                counter = counter + 1;
-                dictNumElementsRegionSpecific[ccf[str(l[3])]] = counter;
-                num_points_by_region_dict[l[3]] = counter
+            if str(l[3]) not in ccf.keys():
+                print l[3];
+            else:
+                if l[3] == allUniqueSpecific[i]:
+                    counter = counter + 1;
+                    dictNumElementsRegionSpecific[ccf[str(l[3])]] = counter;
+                    num_points_by_region_dict[l[3]] = counter
 
     region_names = dictNumElementsRegionSpecific.keys()
     number_repetitions = dictNumElementsRegionSpecific.values()
+    
+    print "Done counting!"
 
     from itertools import izip
 
@@ -625,15 +765,16 @@ def generate_region_graph(token, points_path, output_path=None):
     region_dict = OrderedDict()
 
     for l in specificRegionsNP:
-        trace = ccf[str(l[3])]
-        # trace = 'trace' + str(l[3])
-        if trace not in region_dict:
-            region_dict[trace] = np.array([[l[0], l[1], l[2], l[3]]])
-            # print 'yay'
-        else:
-            tmp = np.array([[l[0], l[1], l[2], l[3]]])
-            region_dict[trace] = np.concatenate((region_dict.get(trace, np.zeros((1, 4))), tmp), axis=0)
-            # print 'nay'
+        if str(l[3]) in ccf.keys():
+            trace = ccf[str(l[3])]
+            # trace = 'trace' + str(l[3])
+            if trace not in region_dict:
+                region_dict[trace] = np.array([[l[0], l[1], l[2], l[3]]])
+                # print 'yay'
+            else:
+                tmp = np.array([[l[0], l[1], l[2], l[3]]])
+                region_dict[trace] = np.concatenate((region_dict.get(trace, np.zeros((1, 4))), tmp), axis=0)
+                # print 'nay'
 
     current_palette = sns.color_palette("husl", numRegionsA)
     # print current_palette
@@ -654,10 +795,10 @@ def generate_region_graph(token, points_path, output_path=None):
             mode='markers',
             name=ccf[final],
             marker=dict(
-                size=1.2,
+                size=3,
                 color=tmp_col_lit,  # 'purple',                # set color to an array/list of desired values
                 colorscale='Viridis',  # choose a colorscale
-                opacity=0.2
+                opacity=0.5
             )
         )
 
@@ -684,7 +825,7 @@ def generate_region_graph(token, points_path, output_path=None):
 
 def generate_density_graph(graph_path, output_path=None, plot_title=""):
     """
-    Creates a plotly scatterplot of the brain with each node colored according to how many edges it has,
+    Creates a plotly scatterplot of the brain with each node colored according to how many edges it has, 
     and saves if output_path is specified, and saves a heatmap as well.
     :param graph_path: The path to a graphml file.
     :param output_path: The path to save the output plotly html file to.
@@ -695,13 +836,13 @@ def generate_density_graph(graph_path, output_path=None, plot_title=""):
     maxEdges = 0
     scaledEdges = 0
     heatmapbrain = None
-
+    
     ## This finds the maximum number of edges and the densest node.
     G = nx.read_graphml(graph_path)
 
     max_edges = 0
     densestNode = ""
-
+            
     for node in G.nodes():
         num_edges = len(G.edges(node))
         if (num_edges > max_edges):
@@ -727,14 +868,14 @@ def generate_density_graph(graph_path, output_path=None, plot_title=""):
     numColors = max_edges;
 
     # scaledEdges = [float(numberEdges[i])/float(upperLimit) for i in range(len(numberEdges))]
-    scaledEdges = [float(numberEdges[i]) / float(max_edges) for i in range(len(numberEdges))]
+    #scaledEdges = [float(numberEdges[i])/float(max_edges) for i in range(len(numberEdges))]
 
     ##Tweak this to change the heat map scaling for the points.  Remove outliers.
 
     ##Tweak this to change the heat map scaling for the points.  Remove outliers.
     ##False coloration heatmap below.  I've commented it out in this version b/c the rainbows
     ##are difficult to interpret.  I've included a newer red version.
-
+    
     # Let null values (0.0) have color rgb(0, 0, 0)
     heatMapBrain = [
         # Let null values (0.0) have color rgb(0, 0, 0)
@@ -767,15 +908,15 @@ def generate_density_graph(graph_path, output_path=None, plot_title=""):
         [0.9, '#fff7ec'],
         [1.0, '#fff7ec']
     ]
-
+    
     g = G
 
-    #     # grab the node positions from the graphML file
-    #     V = nx.number_of_nodes(g)
-    #     attributes = nx.get_node_attributes(g, 'coord')
-    #     node_positions_3d = pd.DataFrame(columns=['x', 'y', 'z'], index=range(V))
-    #     for n in g.nodes_iter():
-    #         node_positions_3d.loc[n] = [int((re.findall('\d+', str(attributes[n])))[0]), int((re.findall('\d+', str(attributes[n])))[1]), int((re.findall('\d+', str(attributes[n])))[2])]
+#     # grab the node positions from the graphML file
+#     V = nx.number_of_nodes(g)
+#     attributes = nx.get_node_attributes(g, 'coord')
+#     node_positions_3d = pd.DataFrame(columns=['x', 'y', 'z'], index=range(V))
+#     for n in g.nodes_iter():
+#         node_positions_3d.loc[n] = [int((re.findall('\d+', str(attributes[n])))[0]), int((re.findall('\d+', str(attributes[n])))[1]), int((re.findall('\d+', str(attributes[n])))[2])]
 
     # grab edge endpoints
     edge_x = []
@@ -801,9 +942,9 @@ def generate_density_graph(graph_path, output_path=None, plot_title=""):
                                          size=6,
                                          opacity=0,
                                          color=color_list,
-                                         colorscale=heatMapBrain),
-                           # text=[str(r) for r in range(V)],
-                           # text=atlas_data['nodes'],
+                                         colorscale=heatMapBrain),     
+                                       # text=[str(r) for r in range(V)],
+                                       # text=atlas_data['nodes'],
                            hoverinfo='text')
     # edge style
     '''edge_trace = Scatter3d(x=edge_x,
@@ -835,18 +976,18 @@ def generate_density_graph(graph_path, output_path=None, plot_title=""):
 
     data = Data([node_trace])
     fig = Figure(data=data, layout=layout)
-
+    
     if output_path != None:
         plotly.offline.plot(fig, filename=output_path)
 
-    # Get list of all possible number of edges, in order
-    #     setOfAllPossibleNumEdges = set(sortedList)
-    #     listOfAllPossibleNumEdges = list(setOfAllPossibleNumEdges)
-    #     #listOfAllScaledEdgeValues = [listOfAllPossibleNumEdges[i]/upperLimit for i in range(len(listOfAllPossibleNumEdges))]
-    #     listOfAllScaledEdgeValues = [listOfAllPossibleNumEdges[i]/float(maxEdges) for i in range(len(listOfAllPossibleNumEdges))]
+# Get list of all possible number of edges, in order
+#     setOfAllPossibleNumEdges = set(sortedList)
+#     listOfAllPossibleNumEdges = list(setOfAllPossibleNumEdges)
+#     #listOfAllScaledEdgeValues = [listOfAllPossibleNumEdges[i]/upperLimit for i in range(len(listOfAllPossibleNumEdges))]
+#     listOfAllScaledEdgeValues = [listOfAllPossibleNumEdges[i]/float(maxEdges) for i in range(len(listOfAllPossibleNumEdges))]
 
 
-    # heatMapBrain
+    #heatMapBrain
 
     data = Data([
         Scatter(
@@ -863,33 +1004,33 @@ def generate_density_graph(graph_path, output_path=None, plot_title=""):
     ])
 
     layout = Layout(title='false coloration scheme',
-                    width=800,
-                    height=900,
-                    showlegend=False,
-                    margin=Margin(t=50),
-                    hovermode='closest',
-                    xaxis=dict(
-                        title='Number of Unique Colors',
-                        titlefont=dict(
+                        width=800,
+                        height=900,
+                        showlegend=False,
+                        margin=Margin(t=50),
+                        hovermode='closest',
+                        xaxis=dict(
+                            title='Number of Unique Colors',
+                            titlefont=dict(
                             family='Courier New, monospace',
                             size=18,
                             color='#000000')
-                    ),
-                    yaxis=dict(
-                        title='Number of Edges',
-                        titlefont=dict(
+                            ),
+                        yaxis=dict(
+                            title='Number of Edges',
+                            titlefont=dict(
                             family='Courier New, monospace',
                             size=18,
                             color='#000000')
-                    ),
-                    paper_bgcolor='rgba(255,255,255,255)',
-                    plot_bgcolor='rgb(255,255,255)')
+                            ),
+                        paper_bgcolor='rgba(255,255,255,255)',
+                        plot_bgcolor='rgb(255,255,255)')
 
     mapping = Figure(data=data, layout=layout)
-    # iplot(mapping, validate=False)
-
+    #iplot(mapping, validate=False)
+    
     if output_path != None:
         plotly.offline.plot(mapping, filename=output_path.split('.')[0] + '_heatmap.html')
 
-    # plotly.offline.plot(mapping, filename = self._token + '/' + self._token + 'heatmap' + '.html')
+    #plotly.offline.plot(mapping, filename = self._token + '/' + self._token + 'heatmap' + '.html')
     return fig, mapping

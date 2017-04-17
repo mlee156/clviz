@@ -30,3 +30,12 @@
 
 ### Improved
 - fixed imports by removing jupyter notebook inline stuff
+
+# 0.1.2
+4/17/17
+
+### Added
+- tractography.py - computing tensors
+
+### Improved
+- analysis.py - updated code to use new ndreg and new ndio
