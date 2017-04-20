@@ -451,6 +451,7 @@ def get_regions(points_path, anno_path, output_path):
     :param output_path: Output file path for where to save the regions csv.
     :return: Array with additional 5th column being the region IDs.
     """
+    print('Getting regions...')
     atlas = nib.load(anno_path)  # <- atlas .nii image
     atlas_data = atlas.get_data()
 
@@ -485,6 +486,7 @@ def get_regions(points_path, anno_path, output_path):
     print uniq
 
     p = np.genfromtxt(output_path, delimiter=',')
+    print('Finished getting regions.')
     return p
 
 
@@ -497,6 +499,7 @@ def create_graph(points_path, radius=20, output_filename=None):
     :param output_filename:
     :return:
     """
+    print('Beginning create_graph')
     points = np.genfromtxt(points_path, delimiter=',', dtype='int')
 
     g = nx.Graph()
