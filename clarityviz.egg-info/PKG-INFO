@@ -1,13 +1,14 @@
 Metadata-Version: 1.1
 Name: clarityviz
-Version: 0.0.4
-Summary: A pipeline used to vizualize clarity treated brain images.
+Version: 0.1.4
+Summary: A pipeline used to vizualize and analyze clarity treated brain images.
 Home-page: https://github.com/NeuroDataDesign/seelviz
 Author: Albert Lee, Jonathan Liu, Tony Sun, Luke Zhu
 Author-email: albertlee@jhu.edu, jliu118@jhu.edu, tsun11@jhu.edu, lzhu20@jhu.edu
 License: UNKNOWN
+Download-URL: https://github.com/alee156/clviz/tarball/0.1.4
 Description: UNKNOWN
-Keywords: clarity,local equilization,pipeline,plot3d,plotly
+Keywords: clarity,brain,histogram equalization,connectivity,plotly
 Platform: UNKNOWN
 Classifier: Development Status :: 3 - Alpha
 Classifier: Programming Language :: Python :: 2.7
