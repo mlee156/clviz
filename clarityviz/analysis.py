@@ -349,7 +349,7 @@ def downsample(im, num_points=10000, optimize=True):
     print("Finished")
     return points
 
-def run_pipeline(token, cert_path, resolution=5):
+def run_pipeline(token, cert_path, resolution=5, points_path=''):
     """
     Runs each individual part of the pipeline.
     :param token: Token name for REGISTERED brains in NeuroData.  (https://dev.neurodata.io/nd/ca/public_tokens/)
@@ -357,12 +357,13 @@ def run_pipeline(token, cert_path, resolution=5):
     :param resolution: Resolution for the brains in NeuroData (from raw image data at resolution 0 to ds levels at resolution 5)
     """
     #register(token, cert_path, orientation, resolution)
-    get_registered(token, cert_path);
-    path = "img/" + token + "_regis.nii"  #why _anno?  That's the refAnnoImg...
-    im = apply_clahe(path);
-    output_ds = downsample(im, num_points=10000);
-    save_points(output_ds, "points/" + token + ".csv")
-    points_path = "points/" + token + ".csv";
+    if points_path == '':
+        get_registered(token, cert_path)
+        path = "img/" + token + "_regis.nii"  #why _anno?  That's the refAnnoImg...
+        im = apply_clahe(path);
+        output_ds = downsample(im, num_points=10000);
+        save_points(output_ds, "points/" + token + ".csv")
+        points_path = "points/" + token + ".csv";
     generate_pointcloud(points_path, "output/" + token + "_pointcloud.html");
     get_atlas_annotate(cert_path, save=True);
     get_regions(points_path, "atlas/ara3_annotation.nii", "points/" + token + "_regions.csv");
@@ -453,7 +454,7 @@ def get_regions(points_path, anno_path, output_path):
     atlas = nib.load(anno_path)  # <- atlas .nii image
     atlas_data = atlas.get_data()
 
-    points = np.genfromtxt(points_path, delimiter=',')
+    points = np.genfromtxt(points_path, delimiter=',', dtype=int)
 
     locations = points[:, 0:3]
 
