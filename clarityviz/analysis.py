@@ -457,8 +457,15 @@ def get_regions(points_path, anno_path, output_path):
 
     locations = points[:, 0:3]
 
+    regions = []
+
     # getting the region numbers
-    regions = [atlas_data[l[0], l[1], l[2]] for l in locations]
+    for i in range(len(locations)):
+        point = locations[i]
+        region = atlas_data[point[0], point[1], point[2]]
+        regions.append(region)
+
+    # regions = [atlas_data[l[0], l[1], l[2]] for l in locations]
 
     outfile = open(output_path, 'w')
     infile = open(points_path, 'r')
