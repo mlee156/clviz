@@ -1088,6 +1088,8 @@ def generate_scaled_centroids_graph(token, points_path, output_path=None):
     :param output_path: Filepath for where to save output html.
     :param resolution: Resolution for spacing (see openConnecto.me spacing)
     :return:
+
+    TODO: test this
     """
 
     # Type in the path to your csv file here
