@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="77171071-222a-4533-b365-89763b371e0b" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/s3617_to_ara3_regions.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/clarityviz/analysis.py" afterPath="$PROJECT_DIR$/clarityviz/analysis.py" />
-    </list>
+    <list default="true" id="77171071-222a-4533-b365-89763b371e0b" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -43,8 +39,8 @@
       <file leaf-file-name="analysis.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/clarityviz/analysis.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="173">
-              <caret line="1091" column="18" lean-forward="false" selection-start-line="1091" selection-start-column="18" selection-end-line="1091" selection-end-column="18" />
+            <state relative-caret-position="3308">
+              <caret line="1297" column="23" lean-forward="false" selection-start-line="1297" selection-start-column="23" selection-end-line="1297" selection-end-column="23" />
               <folding>
                 <element signature="e#45#62#0" expanded="true" />
               </folding>
@@ -808,8 +804,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/clarityviz/analysis.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="173">
-          <caret line="1091" column="18" lean-forward="false" selection-start-line="1091" selection-start-column="18" selection-end-line="1091" selection-end-column="18" />
+        <state relative-caret-position="3308">
+          <caret line="1297" column="23" lean-forward="false" selection-start-line="1297" selection-start-column="23" selection-end-line="1297" selection-end-column="23" />
           <folding>
             <element signature="e#45#62#0" expanded="true" />
           </folding>
