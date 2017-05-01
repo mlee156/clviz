@@ -1,0 +1,24 @@
+{
+    "jobName": "testjob",
+    "jobQueue": "testqueue",
+    "dependsOn": [],
+    "jobDefinition": "testdefinition2",
+    "parameters": {},
+    "containerOverrides": {
+        "command": [
+            "arg1",
+            "arg2",
+            "arg3"
+        ],
+        "environment": [
+            {
+                "name": "AWS_ACCESS_KEY_ID",
+                "value": "AKIAITDU7VWKMZLVARCA"
+            },
+            {
+                "name": "AWS_SECRET_ACCESS_KEY",
+                "value": "QX0duMyZ6inCE62kxQHv8tCMR3xYrupPLzP1AVhv"
+            }
+        ]
+    }
+}

@@ -51,7 +51,8 @@ def get_raw_brain(inToken, cert_path, resolution=5, save=False, output_path=None
     :return inImg: The brain image of interest.
     """
     server = "dev.neurodata.io"
-    userToken = txtRead(cert_path).strip()
+    # userToken = txtRead(cert_path).strip()
+    userToken = '66f7047312cd835ea8952efb3b565b0fedd52fea'
     
     inImg = imgDownload(inToken, resolution=5, server=server, userToken=userToken)
     # Saving raw image
@@ -72,7 +73,8 @@ def get_atlas(cert_path, save=False, output_path=None):
     """
     refToken = "ara3"
     server = "dev.neurodata.io"
-    userToken = txtRead(cert_path).strip()
+    # userToken = txtRead(cert_path).strip()
+    userToken = '66f7047312cd835ea8952efb3b565b0fedd52fea'
 
     refImg = imgDownload(refToken, channel="average", server=server, userToken=userToken)
     # Saving annotations
@@ -92,7 +94,8 @@ def get_atlas_annotate(cert_path, save=False, output_path=None):
     """
     refToken = "ara3"
     server = "dev.neurodata.io"
-    userToken = txtRead(cert_path).strip()
+    # userToken = txtRead(cert_path).strip()
+    userToken = '66f7047312cd835ea8952efb3b565b0fedd52fea'
 
     refImg = imgDownload(refToken, channel="annotation", server=server, userToken=userToken)
     # Saving annotations
@@ -114,7 +117,8 @@ def get_registered(token, cert_path):
     # Load certification and server details
     registeredToken = token;
     server = "dev.neurodata.io";
-    userToken = txtRead(cert_path).strip()
+    # userToken = txtRead(cert_path).strip()
+    userToken = '66f7047312cd835ea8952efb3b565b0fedd52fea'
     
     print("Getting registered brain from server...");
     
@@ -149,7 +153,8 @@ def register(token, cert_path, orientation, resolution=5, raw_im=None, atlas=Non
     # Load certification and find raw atlas/annotated channel/raw data
     refToken = "ara3"
     server = "dev.neurodata.io"
-    userToken = txtRead(cert_path).strip()
+    # userToken = txtRead(cert_path).strip()
+    userToken = '66f7047312cd835ea8952efb3b565b0fedd52fea'
 
     print("Getting data from server...");
     
