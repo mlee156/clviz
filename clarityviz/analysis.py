@@ -1306,4 +1306,4 @@ def generate_scaled_centroids_graph(token, points_path, output_path=None):
     if output_path != None:
         plotly.offline.plot(fig, filename=output_path)
 
-    return centroids
+    return centroids, fig
