@@ -349,17 +349,23 @@ def downsample(im, num_points=10000, optimize=True):
     print("Finished")
     return points
 
-def run_pipeline(token, cert_path, resolution=5, points_path=''):
+def run_pipeline(token, cert_path, resolution=5, points_path='', regis_path=''):
     """
     Runs each individual part of the pipeline.
     :param token: Token name for REGISTERED brains in NeuroData.  (https://dev.neurodata.io/nd/ca/public_tokens/)
     :param orientation: Orientation of brain in NeuroData (eg: LSA, RSI)
     :param resolution: Resolution for the brains in NeuroData (from raw image data at resolution 0 to ds levels at resolution 5)
+    :param points_path: The path to the csv of points, skipping downloading, registration, and clahe
+    :param regis_path: The path to the nii of the registered brain, skipping downloading.
     """
     #register(token, cert_path, orientation, resolution)
+    path = ''
     if points_path == '':
-        get_registered(token, cert_path)
-        path = "img/" + token + "_regis.nii"  #why _anno?  That's the refAnnoImg...
+        if regis_path == '':
+            get_registered(token, cert_path)
+            path = "img/" + token + "_regis.nii"  #why _anno?  That's the refAnnoImg...
+        else:
+            path = regis_path
         im = apply_clahe(path);
         output_ds = downsample(im, num_points=10000);
         save_points(output_ds, "points/" + token + ".csv")
