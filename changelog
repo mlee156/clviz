@@ -48,3 +48,10 @@
 ### Improved
 - fixed using float as list index issue in analysis.get_regions()
 - added a few more print statements to track progress of pipeline
+
+# 0.1.5
+
+5/7/17
+
+### Added
+- added generate_scaled_centroids_graph to analysis.py

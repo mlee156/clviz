@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="77171071-222a-4533-b365-89763b371e0b" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/utils/web/clviz_def.json" afterPath="$PROJECT_DIR$/utils/web/clviz_def.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/utils/web/clviz_env.json" afterPath="$PROJECT_DIR$/utils/web/clviz_env.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/utils/web/clviz_job.json" afterPath="$PROJECT_DIR$/utils/web/clviz_job.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/utils/web/clviz_queue.json" afterPath="$PROJECT_DIR$/utils/web/clviz_queue.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/changelog" afterPath="$PROJECT_DIR$/changelog" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/clarityviz/__init__.py" afterPath="$PROJECT_DIR$/clarityviz/__init__.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/setup.py" afterPath="$PROJECT_DIR$/setup.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,11 +16,43 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="setup.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/setup.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="315">
+              <caret line="23" column="63" lean-forward="false" selection-start-line="23" selection-start-column="63" selection-end-line="23" selection-end-column="63" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="changelog" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/changelog">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="197">
+              <caret line="50" column="0" lean-forward="true" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/clarityviz/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="45">
+              <caret line="3" column="15" lean-forward="false" selection-start-line="3" selection-start-column="15" selection-end-line="3" selection-end-column="15" />
+              <folding>
+                <element signature="e#0#23#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="analysis.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/clarityviz/analysis.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="278">
-              <caret line="1308" column="25" lean-forward="false" selection-start-line="1308" selection-start-column="25" selection-end-line="1308" selection-end-column="25" />
+            <state relative-caret-position="-3097">
+              <caret line="1083" column="34" lean-forward="false" selection-start-line="1083" selection-start-column="34" selection-end-line="1083" selection-end-column="34" />
               <folding>
                 <element signature="e#45#62#0" expanded="true" />
               </folding>
@@ -30,49 +60,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="natureCCFOhedited.csv" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/natureCCFOhedited.csv">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="s3617_to_ara3_regions.csv" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/s3617_to_ara3_regions.csv">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pipeline_test.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/pipeline_test.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="44" lean-forward="false" selection-start-line="5" selection-start-column="44" selection-end-line="5" selection-end-column="44" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="clviz_cloud.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/utils/web/clviz_cloud.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4245">
-              <caret line="283" column="24" lean-forward="false" selection-start-line="283" selection-start-column="24" selection-end-line="283" selection-end-column="24" />
-              <folding>
-                <element signature="e#0#35#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="create_job.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="create_job.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils/web/create_job.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="89">
@@ -163,18 +151,18 @@
         <option value="$PROJECT_DIR$/utils/execute_text.py" />
         <option value="$PROJECT_DIR$/utils/upload.py" />
         <option value="$PROJECT_DIR$/utils/execute.py" />
-        <option value="$PROJECT_DIR$/setup.py" />
-        <option value="$PROJECT_DIR$/clarityviz/__init__.py" />
-        <option value="$PROJECT_DIR$/changelog" />
         <option value="$PROJECT_DIR$/tests/docker_test.py" />
         <option value="$PROJECT_DIR$/utils/clviz_cloud.py" />
         <option value="$PROJECT_DIR$/tests/pipeline_test.py" />
-        <option value="$PROJECT_DIR$/clarityviz/analysis.py" />
         <option value="$PROJECT_DIR$/utils/web/create_job.py" />
         <option value="$PROJECT_DIR$/utils/web/clviz_job.json" />
         <option value="$PROJECT_DIR$/utils/web/clviz_env.json" />
         <option value="$PROJECT_DIR$/utils/web/clviz_def.json" />
         <option value="$PROJECT_DIR$/utils/web/clviz_queue.json" />
+        <option value="$PROJECT_DIR$/clarityviz/__init__.py" />
+        <option value="$PROJECT_DIR$/setup.py" />
+        <option value="$PROJECT_DIR$/clarityviz/analysis.py" />
+        <option value="$PROJECT_DIR$/changelog" />
       </list>
     </option>
   </component>
@@ -221,7 +209,21 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="utils" />
+              <option name="myItemId" value="tarball" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clviz" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clviz" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clarityviz" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -417,7 +419,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32148626" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32148626" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -445,7 +447,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/clarityviz/claritybase.py" />
     <entry file="file://$PROJECT_DIR$/prototype/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -643,13 +644,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/clarityviz/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="15" lean-forward="false" selection-start-line="3" selection-start-column="15" selection-end-line="3" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils/upload.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="308">
@@ -662,23 +656,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/changelog">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="287">
-          <caret line="49" column="64" lean-forward="false" selection-start-line="49" selection-start-column="64" selection-end-line="49" selection-end-column="64" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="9" column="5" lean-forward="false" selection-start-line="9" selection-start-column="5" selection-end-line="9" selection-end-column="5" />
-          <folding>
-            <element signature="e#79#122#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -732,16 +709,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/clarityviz/analysis.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="278">
-          <caret line="1308" column="25" lean-forward="false" selection-start-line="1308" selection-start-column="25" selection-end-line="1308" selection-end-column="25" />
-          <folding>
-            <element signature="e#45#62#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils/web/clviz_cloud.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4245">
@@ -791,6 +758,50 @@
           <folding>
             <element signature="e#0#35#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/clarityviz/analysis.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3097">
+          <caret line="1083" column="34" lean-forward="false" selection-start-line="1083" selection-start-column="34" selection-end-line="1083" selection-end-column="34" />
+          <folding>
+            <element signature="e#45#62#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/clarityviz.m.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/changelog">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="197">
+          <caret line="50" column="0" lean-forward="true" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/clarityviz/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="15" lean-forward="false" selection-start-line="3" selection-start-column="15" selection-end-line="3" selection-end-column="15" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/setup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="23" column="63" lean-forward="false" selection-start-line="23" selection-start-column="63" selection-end-line="23" selection-end-column="63" />
+          <folding />
         </state>
       </provider>
     </entry>
