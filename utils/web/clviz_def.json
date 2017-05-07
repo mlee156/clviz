@@ -1,8 +1,8 @@
 {
-    "jobDefinitionName": "orange-panda-pipeline",
+    "jobDefinitionName": "clviz-pipeline",
     "type": "container",
     "containerProperties": {
-        "image": "rymarr/panda_pipeline",
+        "image": "jliu118/clarityviz:run",
         "vcpus": 2,
         "memory": 2000,
         "readonlyRootFilesystem": false,

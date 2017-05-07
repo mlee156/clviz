@@ -22,6 +22,6 @@
         "type": "EC2"
     },
     "state": "ENABLED",
-    "computeEnvironmentName": "pseudo-orange-panda8",
+    "computeEnvironmentName": "clviz-env",
     "type": "MANAGED"
 }

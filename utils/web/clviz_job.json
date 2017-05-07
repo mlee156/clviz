@@ -1,15 +1,14 @@
 {
     "jobName": "<JOBNAME>",
-    "jobQueue": "orange-panda-queue",
+    "jobQueue": "clviz-queue",
     "dependsOn": [],
-    "jobDefinition": "orange-panda-pipeline",
+    "jobDefinition": "clviz-pipeline",
     "parameters": {},
     "containerOverrides": {
         "command": [
             "<BUCKET>",
-            "<DATASET>",
-            "<SUB>",
-            "<SES>"
+            "<TOKEN>",
+            "<RESOLUTION>"
         ],
         "environment": [
             {
