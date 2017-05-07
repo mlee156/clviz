@@ -43,11 +43,10 @@ import scipy.sparse as sp
 
 original_spacing = ();
 
-def get_raw_brain(inToken, cert_path, resolution=5, save=False, output_path=None):
+def get_raw_brain(inToken, resolution=5, save=False, output_path=None):
     """
     Gets raw brain from inToken from NeuroData servers (must be valid token).
     :param inToken: The token for the brain of interest, from NeuroData.
-    :param cert_path: "/cis/project/clarity/code/ndreg/userToken.pem" Path to the pem certificate.
     :param save: Boolean that determines whether to save a local copy, defaults to false
     :param output_path: Path to save the local brain image, defaults to none.
     :return inImg: The brain image of interest.
@@ -65,7 +64,7 @@ def get_raw_brain(inToken, cert_path, resolution=5, save=False, output_path=None
 
     return inImg
 
-def get_atlas(cert_path, save=False, output_path=None):
+def get_atlas(save=False, output_path=None):
     """
     Gets average channel atlas from NeuroData servers (defaults to ara3).
     :param save: Boolean that determines whether to save a local copy, defaults to false
@@ -86,11 +85,10 @@ def get_atlas(cert_path, save=False, output_path=None):
         imgWrite(refImg, str(output_path))
     return refImg
 
-def get_atlas_annotate(cert_path, save=False, output_path=None):
+def get_atlas_annotate(save=False, output_path=None):
     """
     Gets annotation channel atlas from NeuroData servers (defaults to ara3).
     :param save: Boolean that determines whether to save a local copy, defaults to false
-    :param cert_path: "/cis/project/clarity/code/ndreg/userToken.pem" Path to the pem certificate.
     :param output_path: Path to save a copy of the annotation atlas image, defaults to none.
     :return refImg: The annotation atlas image.
     """
@@ -107,13 +105,12 @@ def get_atlas_annotate(cert_path, save=False, output_path=None):
         imgWrite(refImg, str(output_path))
     return refImg
 
-def get_registered(token, cert_path):
+def get_registered(token):
     """
     Gets a copy of the already-registered brain from the NeuroData servers.  This is the equivalent of the inAnnoImg
     that Kwame uploads after he completes registration.  Must be on this list: https://dev.neurodata.io/nd/ca/public_tokens/
     :param token: The token for the registered brain of interest.
-    :param cert_path: Certification path for access to NeuroData.
-    :return inAnnoImg: The SITK image of inAnnoImg that results after LDDMM. 
+    :return inAnnoImg: The SITK image of inAnnoImg that results after LDDMM.
     """
     
     # Load certification and server details
@@ -139,11 +136,10 @@ def get_spacing_registered(filepath):
     global original_spacing;
     original_spacing = original_spacing + imgLoad.GetSpacing();
 
-def register(token, cert_path, orientation, resolution=5, raw_im=None, atlas=None, annotate=None):
+def register(token, orientation, resolution=5, raw_im=None, atlas=None, annotate=None):
     """
     Saves fully registered brain as token + '_regis.nii' and annotated atlas as '_anno.nii'.
     :param token: The token for the brain of interest.
-    :param cert_path: Certification path
     :param orientation: The orientation of the brain (e.g. LSA, RPS).
     :param resolution: Desired resolution of the image (1 - 5).
     :param raw_im: Defaults to None, can take a copy of a brain image from get_raw_brain.
@@ -362,7 +358,7 @@ def downsample(im, num_points=10000, optimize=True):
     print("Finished")
     return points
 
-def run_pipeline(token, cert_path, resolution=5, points_path='', regis_path=''):
+def run_pipeline(token, resolution=5, points_path='', regis_path=''):
     """
     Runs each individual part of the pipeline.
     :param token: Token name for REGISTERED brains in NeuroData.  (https://dev.neurodata.io/nd/ca/public_tokens/)
@@ -371,11 +367,10 @@ def run_pipeline(token, cert_path, resolution=5, points_path='', regis_path=''):
     :param points_path: The path to the csv of points, skipping downloading, registration, and clahe
     :param regis_path: The path to the nii of the registered brain, skipping downloading.
     """
-    #register(token, cert_path, orientation, resolution)
     path = ''
     if points_path == '':
         if regis_path == '':
-            get_registered(token, cert_path)
+            get_registered(token)
             path = "img/" + token + "_regis.nii"  #why _anno?  That's the refAnnoImg...
         else:
             path = regis_path
@@ -384,7 +379,7 @@ def run_pipeline(token, cert_path, resolution=5, points_path='', regis_path=''):
         save_points(output_ds, "points/" + token + ".csv")
         points_path = "points/" + token + ".csv";
     generate_pointcloud(points_path, "output/" + token + "_pointcloud.html");
-    get_atlas_annotate(cert_path, save=True);
+    get_atlas_annotate(save=True);
     get_regions(points_path, "atlas/ara3_annotation.nii", "points/" + token + "_regions.csv");
     points_region_path = "points/" + token + "_regions.csv";
     g = create_graph(points_region_path, output_filename="graphml/" + token + "_graph.graphml");

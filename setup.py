@@ -21,7 +21,7 @@ setup(
     author='Albert Lee, Jonathan Liu, Tony Sun, Luke Zhu',
     author_email='albertlee@jhu.edu, jliu118@jhu.edu, tsun11@jhu.edu, lzhu20@jhu.edu',
     url='https://github.com/NeuroDataDesign/seelviz',
-    download_url='https://github.com/alee156/clviz/tarball/0.1.5',
+    download_url='https://github.com/alee156/clviz/tarball/0.1.6',
     keywords=[
         'clarity',
         'brain',
