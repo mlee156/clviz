@@ -2,20 +2,20 @@
     "serviceRole": "arn:aws:iam::<ACCT_ID>:role/service-role/AWSBatchServiceRole",
     "computeResources": {
         "subnets": [
-            "subnet-ec537db7",
-            "subnet-18c1a77d",
-            "subnet-dece2d96",
-            "subnet-2ad3b416",
-            "subnet-4ee0d363"
+            "subnet-ffe00dc3",
+            "subnet-876bfae2",
+            "subnet-a835daf3",
+            "subnet-072ec72a",
+            "subnet-097ea740"
         ],
         "tags": {},
-        "desiredvCpus": 16,
+        "desiredvCpus": 8,
         "minvCpus": 1,
         "instanceTypes": [
-            "optimal"
+            "m4.2xlarge"
         ],
         "securityGroupIds": [
-            "sg-a21ee6dd"
+            "sg-615e3f1b"
         ],
         "instanceRole": "arn:aws:iam::<ACCT_ID>:instance-profile/ecsInstanceRole",
         "maxvCpus": 256,

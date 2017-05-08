@@ -5,7 +5,7 @@
             "order": 1
         }
     ],
+    "jobQueueName": "clviz-queue",
     "priority": 2,
-    "state": "ENABLED",
-    "jobQueueName": "clviz-queue"
+    "state": "ENABLED"
 }

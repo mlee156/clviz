@@ -39,7 +39,7 @@ def create_env():
     """
 
     # Create env jsons
-    env = "env_template.json"
+    env = "clviz_env.json"
     template = []
 
     # Open template, set account IDs
@@ -53,6 +53,7 @@ def create_env():
       json.dump(template, outfile)
 
     # Check computer environment
+    print('creating env')
     cmd_template = 'aws batch describe-compute-environments  --compute-environments {}'
     env_name = 'clviz-env'
     cmd = cmd_template.format(env_name)
@@ -65,20 +66,25 @@ def create_env():
         out, err = execute_cmd(cmd)
 
     # Create queue
+    print('creating queue')
     cmd_template = 'aws batch describe-job-queues --job-queues {}'
-    env_name = 'clviz-env'
-    cmd = cmd_template.format(env_name)
+    queue_name = 'clviz-queue'
+    cmd = cmd_template.format(queue_name)
     out, err = execute_cmd(cmd)
     result = json.loads(out)
+    # print('RESULT')
+    # print(result)
     if len(result['jobQueues']) == 0:
+        print("inside jobQueue for loop")
         cmd_template = 'aws batch create-job-queue --cli-input-json file://{}'
-        def_json = 'queue_template.json'
+        def_json = 'clviz_queue.json'
         cmd = cmd_template.format(def_json)
         out, err = execute_cmd(cmd)
 
     # Create job definition
+    print('creating job def')
     cmd_template = 'aws batch register-job-definition --cli-input-json file://{}'
-    def_json = 'clviz-def.json'
+    def_json = 'clviz_def.json'
     cmd = cmd_template.format(def_json)
     out, err = execute_cmd(cmd)
     submission = ast.literal_eval(out)
@@ -107,7 +113,7 @@ def create_env():
 #     return seshs
 
 
-def create_json(bucket, threads, jobdir, dataset, credentials=None, log=False):
+def create_json(bucket, jobdir, token, credentials=None, log=False):
     """
     Takes parameters to make jsons
     """
@@ -119,7 +125,9 @@ def create_json(bucket, threads, jobdir, dataset, credentials=None, log=False):
 
     # Set json template filename
     template = "clviz_job.json"
-    seshs = threads
+    # seshs = threads
+
+    print('creating job')
 
     # Open template, grab overrides we need to set
     with open('{}'.format(template), 'r') as inf:
@@ -145,24 +153,33 @@ def create_json(bucket, threads, jobdir, dataset, credentials=None, log=False):
     # set bucket
     cmd[0] = re.sub('(<BUCKET>)', bucket, cmd[0])
     # set path
-    cmd[1] = re.sub('(<TOKEN>)', dataset, cmd[1])
+    cmd[1] = re.sub('(<TOKEN>)', token, cmd[1])
 
-    for subj in seshs.keys():
-        print("... Generating job for sub-{}".format(subj))
-        for sesh in seshs[subj]:
-            job_cmd = deepcopy(cmd)
-            job_cmd[2] = re.sub('(<SUB>)', subj, job_cmd[2])
-            job_cmd[3] = re.sub('(<SES>)', sesh, job_cmd[3])
-            job_json = deepcopy(template)
-            name = 'clviz_sub-{}'.format(subj)
-            if sesh is not None:
-                name = '{}_ses-{}'.format(name, sesh)
-            job_json['jobName'] = name
-            job_json['containerOverrides']['command'] = job_cmd
-            job = os.path.join(jobdir, 'jobs', name + '.json')
-            with open(job, 'w') as outfile:
-                json.dump(job_json, outfile)
-            jobs += [job]
+    name = 'clviz_token-{}'.format(token)
+    job_json = deepcopy(template)
+    job_json['jobName'] = name
+    job_json['containerOverrides']['command'] = cmd
+    job = os.path.join(jobdir, 'jobs', name + '.json')
+    with open(job, 'w') as outfile:
+        json.dump(job_json, outfile)
+    jobs = [job]
+
+    # for subj in seshs.keys():
+    #     print("... Generating job for sub-{}".format(subj))
+    #     for sesh in seshs[subj]:
+    #         job_cmd = deepcopy(cmd)
+    #         job_cmd[2] = re.sub('(<SUB>)', subj, job_cmd[2])
+    #         job_cmd[3] = re.sub('(<SES>)', sesh, job_cmd[3])
+    #         job_json = deepcopy(template)
+    #         name = 'clviz_sub-{}'.format(subj)
+    #         if sesh is not None:
+    #             name = '{}_ses-{}'.format(name, sesh)
+    #         job_json['jobName'] = name
+    #         job_json['containerOverrides']['command'] = job_cmd
+    #         job = os.path.join(jobdir, 'jobs', name + '.json')
+    #         with open(job, 'w') as outfile:
+    #             json.dump(job_json, outfile)
+    #         jobs += [job]
 
     return jobs
 
@@ -192,23 +209,30 @@ def main():
     parser.add_argument('--bucket',
                         help='The S3 bucket with the input dataset formatted according to the BIDS standard.')
     parser.add_argument('--credentials', help='AWS formatted csv of credentials.')
-    parser.add_argument('--dataset', help='The data file to upload to the specified S3 bucket')
+    parser.add_argument('--token', help='The token of the brain of interest.')
     result = parser.parse_args()
 
     # convert args to objs
     bucket = str(result.bucket)
     credentials = str(result.credentials)
-    dataset = str(result.dataset)
+    token = str(result.token)
 
     # extract credentials
     credfile = open(credentials, 'rb')
     reader = csv.reader(credfile)
     rowcounter = 0
+    # for row in reader:
+    #     if rowcounter == 1:
+    #         public_access_key = str(row[1])
+    #         secret_access_key = str(row[2])
+    #     rowcounter = rowcounter + 1
     for row in reader:
+        print('row: %s' % row)
         if rowcounter == 1:
-            public_access_key = str(row[1])
-            secret_access_key = str(row[2])
+            public_access_key = str(row[0])
+            secret_access_key = str(row[1])
         rowcounter = rowcounter + 1
+
 
     # set env vars to current credentials
     os.environ['AWS_ACCESS_KEY_ID'] = public_access_key
@@ -218,10 +242,8 @@ def main():
     # create job environment
     create_env()
     # for obj in ["input.txt"]:# s3_bucket.objects.all():
-    threads = crawl_bucket(bucket, dataset)
-    print
-    threads
-    jobs = create_json(bucket, threads, "to_exec", dataset, credentials=credentials, log=False)
+    # threads = crawl_bucket(bucket, dataset)
+    jobs = create_json(bucket, "to_exec", token, credentials=credentials, log=False)
     submit_jobs(jobs, "to_exec")
 
 
