@@ -11,8 +11,9 @@
         "tags": {},
         "desiredvCpus": 8,
         "minvCpus": 1,
+        "imageId": "ami-e310a8f5",
         "instanceTypes": [
-            "m4.2xlarge"
+            "m3.2xlarge"
         ],
         "securityGroupIds": [
             "sg-615e3f1b"

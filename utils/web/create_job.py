@@ -10,6 +10,7 @@ import re
 import csv
 import boto3
 import json
+import time
 import ast
 
 
@@ -64,6 +65,7 @@ def create_env():
         def_json = 'env_out.json'
         cmd = cmd_template.format(def_json)
         out, err = execute_cmd(cmd)
+        time.sleep(5)
 
     # Create queue
     print('creating queue')
@@ -80,6 +82,8 @@ def create_env():
         def_json = 'clviz_queue.json'
         cmd = cmd_template.format(def_json)
         out, err = execute_cmd(cmd)
+        time.sleep(5)
+
 
     # Create job definition
     print('creating job def')

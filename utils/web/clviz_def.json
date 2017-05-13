@@ -9,6 +9,6 @@
         "privileged": false
     },
     "retryStrategy": {
-        "attempts": 2
+        "attempts": 1
     }
 }
