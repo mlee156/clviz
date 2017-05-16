@@ -132,7 +132,7 @@ def connectivity_heatmap(b_hat, outdir, token, num_points):
     layout = Layout(title='Spectral Embedding Estimated Connectivity B_hat')
     fig = Figure(data=data, layout=layout)
     # iplot(fig, validate=False)
-    plotly.offline.plot(fig, filename=outdir + "/" + token + "_heatmap_est_connectivity_" + num_points + ".html")
+    plotly.offline.plot(fig, filename=outdir + "/" + token + "_heatmap_est_connectivity_" + str(num_points) + ".html")
 
 
 def estimate_connectivity(graphml, outdir, token, num_points):
@@ -160,7 +160,7 @@ def estimate_connectivity(graphml, outdir, token, num_points):
         else:
             se_regions[str(reg)].append(pos)
 
-    connect = plot_connectivity(se_regions, outdir + "/" + token + "_spectral_embedding_" + num_points + ".html")
+    connect = plot_connectivity(se_regions, outdir + "/" + token + "_spectral_embedding_" + str(num_points) + ".html")
     connectivity_heatmap(connect, outdir, token, num_points)
     print("Finished estimating connectivity.")
     return connect
