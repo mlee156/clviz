@@ -404,7 +404,7 @@ def generate_pointcloud(points_path, output_path):
     :return:
     """
     # Type in the path to your csv file here
-    thedata = None
+    print('Generating pointcloud...')
     thedata = np.genfromtxt(points_path,
         delimiter=',', dtype='int', usecols = (0,1,2), names=['a','b','c'])
 
@@ -449,6 +449,7 @@ def generate_pointcloud(points_path, output_path):
         os.makedirs('output');
 
     plotly.offline.plot(fig, filename=output_path)
+    print('Finished generating pointcloud.')
 
 #     plotly.offline.plot(fig, filename= 'output/' + self._token + "/" + self._token + "_brain_pointcloud.html")
 
@@ -867,7 +868,7 @@ def generate_density_graph(graph_path, output_path=None, plot_title=""):
     :param plot_title: The title of the plot.
     :return: The plotly figure and the heatmap
     """
-    print('Generating scaled centroids graph...')
+    print('Generating density graph...')
     sortedList = None
     maxEdges = 0
     scaledEdges = 0
@@ -1068,7 +1069,7 @@ def generate_density_graph(graph_path, output_path=None, plot_title=""):
     if output_path != None:
         plotly.offline.plot(mapping, filename=output_path.split('.')[0] + '_heatmap.html')
 
-    print('Finished generating scaled centroids graph.')
+    print('Finished generating density graph.')
     #plotly.offline.plot(mapping, filename = self._token + '/' + self._token + 'heatmap' + '.html')
     return fig, mapping
 
@@ -1084,8 +1085,8 @@ def generate_scaled_centroids_graph(token, points_path, output_path=None):
     TODO: test this
     """
 
+    print('Generating scaled centroids graph...')
     # Type in the path to your csv file here
-    thedata = None
     thedata = np.genfromtxt(points_path,
                             delimiter=',', dtype='int', usecols=(0, 1, 2, 4), names=['a', 'b', 'c', 'region'])
 
@@ -1297,5 +1298,7 @@ def generate_scaled_centroids_graph(token, points_path, output_path=None):
 
     if output_path != None:
         plotly.offline.plot(fig, filename=output_path)
+
+    print('Finished generating scaled centroids graph.')
 
     return centroids, fig
