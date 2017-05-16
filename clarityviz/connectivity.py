@@ -129,7 +129,7 @@ def plot_connectivity(dictionary, outfile):
 def connectivity_heatmap(b_hat, outdir, token, num_points):
     trace = Heatmap(z=b_hat)
     data = [trace]
-    layout = Layout(title='Spectral Embedding Estimated Connectivity B_hat')
+    layout = Layout(title='Spectral Embedding Estimated Connectivity B_hat', width=800, height=800)
     fig = Figure(data=data, layout=layout)
     # iplot(fig, validate=False)
     plotly.offline.plot(fig, filename=outdir + "/" + token + "_heatmap_est_connectivity_" + str(num_points) + ".html")

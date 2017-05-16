@@ -504,7 +504,7 @@ def get_regions(points_path, anno_path, output_path):
     return p, uniq
 
 
-def create_graph(points_path, radius=20, output_filename=None):
+def create_graph(points_path, radius=35, output_filename=None):
     """
     Function for creating networkx graph object using epsilon ball to find edges.
     Saves to a .graphml if output_filename is specified.

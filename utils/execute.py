@@ -40,7 +40,7 @@ def run_pipeline(token, resolution=5, num_points=10000, points_path='', regis_pa
     points_region_path = "points/" + token + "_regions_" + str(num_points) + ".csv";
 
     # Generating the graphml.
-    g = clv.analysis.create_graph(points_region_path, output_filename="graphml/" + token + "_graph_" + str(num_points) + ".graphml");
+    g = clv.analysis.create_graph(points_region_path, radius=35, output_filename="graphml/" + token + "_graph_" + str(num_points) + ".graphml");
     # Generating the edge graph.
     clv.analysis.plot_graphml3d(g, output_path="output/" + token + "_edgegraph_" + str(num_points) + ".html");
     # Generating the region graph.
