@@ -348,7 +348,7 @@ def extract_bright_points(im, num_points=10000, bp_percentile=0.75, optimize=Tru
     print("Finished")
     return points
 
-def run_pipeline(token, resolution=5, num_points, points_path='', regis_path=''):
+def run_pipeline(token, resolution=5, num_points=10000, points_path='', regis_path=''):
     """
     Runs each individual part of the pipeline.
     :param token: Token name for REGISTERED brains in NeuroData.  (https://dev.neurodata.io/nd/ca/public_tokens/)
@@ -366,21 +366,21 @@ def run_pipeline(token, resolution=5, num_points, points_path='', regis_path='')
             path = regis_path
         im = apply_clahe(path);
         output_ds = extract_bright_points(im, num_points=num_points);
-        save_points(output_ds, "points/" + token + ".csv")
-        points_path = "points/" + token + ".csv";
+        save_points(output_ds, "points/" + token + "_" + num_points + ".csv")
+        points_path = "points/" + token + "_" + num_points + ".csv";
     # Generating point cloud
     generate_pointcloud(points_path, "output/" + token + "_pointcloud_" + num_points + ".html");
     get_atlas_annotate(save=True);
-    get_regions(points_path, "atlas/ara3_annotation.nii", "points/" + token + "_regions.csv");
-    points_region_path = "points/" + token + "_regions.csv";
+    get_regions(points_path, "atlas/ara3_annotation.nii", "points/" + token + "_regions_" + num_points + ".csv");
+    points_region_path = "points/" + token + "_regions_" + num_points + ".csv";
 
-    g = create_graph(points_region_path, output_filename="graphml/" + token + "_graph.graphml");
+    g = create_graph(points_region_path, output_filename="graphml/" + token + "_graph_" + num_points + ".graphml");
     # Generating edge graph
     plot_graphml3d(g, output_path="output/" + token + "_edgegraph_" + num_points + ".html");
     # Generating region graph.
     generate_region_graph(token, points_region_path, output_path="output/" + token + "_regions_" + num_points + ".html");
     # Generating density graph + density heatmap
-    generate_density_graph(graph_path="graphml/" + token + "_graph.graphml", output_path="output/" + token + "_density_" + num_points + ".html", plot_title="False-Color Density of " + token);
+    generate_density_graph(graph_path="graphml/" + token + "_graph_" + num_points + ".graphml", output_path="output/" + token + "_density_" + num_points + ".html", plot_title="False-Color Density of " + token);
     print("Completed pipeline...!")
 
 def save_points(points, output_path):
@@ -867,6 +867,7 @@ def generate_density_graph(graph_path, output_path=None, plot_title=""):
     :param plot_title: The title of the plot.
     :return: The plotly figure and the heatmap
     """
+    print('Generating scaled centroids graph...')
     sortedList = None
     maxEdges = 0
     scaledEdges = 0
@@ -1067,6 +1068,7 @@ def generate_density_graph(graph_path, output_path=None, plot_title=""):
     if output_path != None:
         plotly.offline.plot(mapping, filename=output_path.split('.')[0] + '_heatmap.html')
 
+    print('Finished generating scaled centroids graph.')
     #plotly.offline.plot(mapping, filename = self._token + '/' + self._token + 'heatmap' + '.html')
     return fig, mapping
 

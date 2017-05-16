@@ -1,281 +1,166 @@
-#!/usr/bin/env python
-#-*- coding:utf-8 -*-
-
-import matplotlib
-from matplotlib import pyplot as plt
+from plotly.offline import download_plotlyjs, iplot
+from plotly.graph_objs import *
+from plotly import tools
+import plotly
 
 import numpy as np
 from numpy import linalg as LA
-import cv2
-import math
-
-import plotly
-from plotly.graph_objs import *
-from plotly.offline import download_plotlyjs, init_notebook_mode, iplot
-from plotly import tools
-
-import time
-import collections as col
-from collections import OrderedDict
-
-import ast
-from ndreg import *
-import ndio.remote.neurodata as neurodata
-
-import nibabel as nib
-import networkx as nx
-import re
-import pandas as pd
-import requests
-import json
-import seaborn as sns
-import csv, gc
-
 from sklearn.manifold import spectral_embedding as se
 
-import scipy.sparse as sp
+import re
+import matplotlib
+import seaborn as sns
+import networkx as nx
+import math
 
-# plotly.offline.init_notebook_mode()
-
-def spec_clust(graphx, num_components):
-    """
-    Function for doing the spectral embedding.
-    :param graphx:
-    :param num_components:
-    :return:
-    """
-    adj_mat = nx.adjacency_matrix(graphx)
-#     result = se(adj_mat, n_components=num_components, drop_first=True)
-    result = se(adj_mat, n_components=num_components, drop_first=False)
-
-    return result
+from collections import OrderedDict
 
 
-def add_to_dict(d, region, index):
-    if region in d:
-        d[region].append(index)
-    else:
-        d[region] = [index]
+def plot_connectivity(dictionary, outfile):
+    ## plot points in XY-plane
+    ## clusters of points are determined beforehand, each group given a different color
+    ## also plots centroid of each cluster ((x,y) of centroid is average of cluster points)
+    ## lines indicate nearest centroid by Euclidean distance, prints distance
+    n = len(dictionary.keys())
+    current_palette = sns.color_palette("husl", n)
+    Xe = []
+    Ye = []
+    Ze = []
+    data = []
+    avg_dict = OrderedDict()
+    i = 0
+    for key, region in dictionary.iteritems():
+        X = []
+        Y = []
+        Z = []
+        tmp_x = []
+        tmp_y = []
+        tmp_z = []
+        region_col = current_palette[i]
+        region_col_lit = 'rgb' + str(region_col)
+        i += 1
+        for coord in region:
+            X.append(coord[0])
+            Y.append(coord[1])
+            Z.append(coord[2])
+            tmp_x.append(coord[0])
+            tmp_y.append(coord[1])
+            tmp_z.append(coord[2])
+        avg_dict[key] = [[np.mean(tmp_x), np.mean(tmp_y), np.mean(tmp_z)]]
 
-    return d
-
-
-def get_adj_mat(regions_path):
-    points = np.genfromtxt(regions_path, delimiter=',')
-    x_dim = np.max(points[:, 0])
-    y_dim = np.max(points[:, 1])
-    z_dim = np.max(points[:, 2])
-    am = SparseMatrix(x_dim, y_dim, z_dim)
-    for point in points:
-        am.add(tuple(point[0:3]), point[4])
-
-    return am
-
-
-def get_dict_real(g, se_result, regions_path):
-    nodes = g.nodes()
-    points = np.genfromtxt(regions_path, delimiter=',')
-    orig_dict = OrderedDict()
-    d = {}
-
-    sparse_mat = get_adj_mat(regions_path)
-
-    for index, node in enumerate(nodes):
-        s = g.node[node]['attr']
-        point = ast.literal_eval(s)
-        region = sparse_mat.get(tuple(point))
-        #         if region == -1:
-        #             # error
-        #             print 'FUCK'
-        add_to_dict(d, region, index)
-
-    for point in points:
-        region = point[4]
-        #         if region in orig_dict:
-        #             orig_dict[region] = np.vstack((orig_dict[region], point[0:3]))
-        #         else:
-        #             orig_dict[region] = np.array([point[0:3]])
-        add_to_dict(orig_dict, region, point[0:3])
-
-    se_regions_nodes = {}
-    se_regions = {}
-    for key, value in d.iteritems():
-        index_list = value
-        nodes_arr = np.array(nodes)
-        pt_names = nodes_arr[index_list]
-        se_pts = se_result[index_list]
-        nodes_to_se = dict(zip(pt_names, se_pts))  # maps from node names to embedded point coordinates
-        se_regions_nodes[key] = nodes_to_se
-        se_regions[key] = se_pts
-
-    return se_regions, orig_dict, se_regions_nodes
-
-
-def create_connectivity_graph(orig_avg_dict, se_avg_dict, max_dist=0.02):
-    g = nx.Graph()
-    for key, avg in se_avg_dict.iteritems():
-        for key2, avg2 in se_avg_dict.iteritems():
-            avg_np = np.array(avg)
-            avg2_np = np.array(avg2)
-            diff = np.linalg.norm(avg_np - avg2_np)
-            diff = max_dist if diff > max_dist else diff
-            g.add_edge(key, key2, weight=diff)
-
-    # Setting the coordinate attribute for each region node to the average of that region.
-    for key, avg in orig_avg_dict.iteritems():
-        g.node[key]['attr'] = avg
-
-    return g
-
-def get_connectivity_hard(eig_dict, orig_dict=None, max_dist=0.02):
-    """
-    Uses create_connectivity_graph.
-    :param eig_dict:
-    :param orig_dict:
-    :return:
-    """
-    eigenvector_index = 1  # the second smallest eigenvector
-    avg_dict = {}
-    orig_avg_dict = OrderedDict()
-
-    # dict that maps from region to most connected region
-    con_dict = OrderedDict()
-
-    orig_con_dict = OrderedDict()
-
-    if orig_dict != None:
-        # Getting the original averages.
-        for key, region in orig_dict.iteritems():
-            tmp_x = []
-            tmp_y = []
-            y_vals = []
-
-            for j in range(len(region)):
-                y_vals.append(region[j])
-            y_vals = np.array(y_vals)
-            x_avg = np.mean(y_vals[:, 0])
-            y_avg = np.mean(y_vals[:, 1])
-            z_avg = np.mean(y_vals[:, 2])
-            orig_avg_dict[key] = [x_avg, y_avg, z_avg]
-        # avg = np.mean(y_vals)
-        #             orig_avg_dict[key] = avg
-
-        #         print 'orignal averages'
-        #         print orig_avg_dict
-
-        # Getting connectivity for original points.
-        for key, avg in orig_avg_dict.iteritems():
-            min_key = ''
-            min_diff = float('inf')
-            for key2, avg2 in orig_avg_dict.iteritems():
-                if key2 == key:
-                    continue
-                avg_np = np.array(avg)
-                avg2_np = np.array(avg2)
-                diff = np.linalg.norm(avg_np - avg2_np)
-                if diff < min_diff:
-                    min_diff = diff
-                    min_key = key2
-
-            orig_con_dict[float(key)] = [float(min_key), min_diff]
-
-    # Getting the average first 2 eigenvector components for each of the regions
-    for key, region in eig_dict.iteritems():
-        #         print(key)
-        y_vals = []
-
-        for j in range(len(region)):
-            y_vals.append(region[j])
-        y_vals = np.array(y_vals)
-        x_avg = np.mean(y_vals[:, 0])
-        y_avg = np.mean(y_vals[:, 1])
-        z_avg = np.mean(y_vals[:, 2])
-        avg_dict[key] = [x_avg, y_avg, z_avg]
-
-    # print('getcon avg_dict')
-    #     print(avg_dict)
-
-    # Computing connectivity between regions using the distance between averages
-    for key, avg in avg_dict.iteritems():
-        min_key = ''
-        min_diff = float('inf')
-        for key2, avg2 in avg_dict.iteritems():
-            if key2 == key:
-                continue
-            avg_np = np.array(avg)
-            avg2_np = np.array(avg2)
-            diff = np.linalg.norm(avg_np - avg2_np)
-            if diff < min_diff:
-                min_diff = diff
-                min_key = key2
-
-        con_dict[float(key)] = [float(min_key), min_diff]
-
-    con_dict = OrderedDict(sorted(con_dict.items()))
-    orig_con_dict = OrderedDict(sorted(orig_con_dict.items()))
-
-    g = create_connectivity_graph(orig_avg_dict, avg_dict, max_dist)
-
-    if orig_dict == None:
-        return con_dict
-    else:
-        return con_dict, orig_con_dict, g
-
-class SparseMatrix:
-    def __init__(self, x, y, z):
-#         self._max_index = 0
-        x_dim = x
-        y_dim = y
-        z_dim = z
-        self._vector = {}
-
-    def add(self, index, value):
-        # vector starts at index one, because it reads from the file and the file
-        # always has the index of the features start at 1
-        self._vector[index] = value
-#         if index > self._max_index:
-#             self._max_index = index
-
-    def get(self, index):
-        # if the index doesn't exist in the dict, return 0 because it's sparse anyways
-        if index in self._vector:
-            return self._vector[index]
-        return -1
-
-    def get_sparse_matrix(self):
-        return self._vector
-        # return self._vector.keys()
-
-#     def get_full_vector(self, size=None):
-#         """ Returns a full vector of features as a numpy array. """
-#         size = (self._max_index + 1) if size == None else size
-#         full_vector = np.zeros(size)  # 0 indexed
-#         for key, value in self._vector.iteritems():
-#             full_vector[key] = value
-
-#         return full_vector
-
-    def __str__(self):
-        return str(self._vector)
-
-def plot_con_mat(con_adj_mat, output_path=None, show=False):
-    title = 'Connectivity Heatmap'
-    data = [
-        Heatmap(
-            z = con_adj_mat,
-    #         x = con_graph.nodes(),
-    #         y = con_graph.nodes()
+        trace_scatter = Scatter3d(
+            x=X,
+            y=Y,
+            z=Z,
+            name=key,
+            mode='markers',
+            marker=dict(
+                size=10,
+                color=region_col_lit,  # 'purple',                # set color to an array/list of desired values
+                colorscale='Viridis',  # choose a colorscale
+                opacity=0.1
+            )
         )
-    ]
-    layout = Layout(
-        title = title,
-        xaxis=dict(title='region'),
-        yaxis=dict(title='region')
-    )
-    fig = Figure(data=data, layout=layout)
-    if show:
-        iplot(fig)
-    if output_path != None:
-        plotly.offline.plot(fig, filename=output_path)
+        avg_scatter = Scatter3d(
+            x=[avg_dict[key][0][0]],
+            y=[avg_dict[key][0][1]],
+            z=[avg_dict[key][0][2]],
+            mode='markers',
+            name=key + '_avg',
+            marker=dict(
+                size=10,
+                color=region_col_lit,
+                colorscale='Viridis',
+                line=dict(
+                    width=2,
+                    color='rgb(0, 0, 0)'
+                )
+            )
+        )
+        data.append(trace_scatter)
+        data.append(avg_scatter)
 
-    return fig
+    connectivity = np.zeros((n, n))
+    locations = avg_dict.keys()
+    for i, key in enumerate(avg_dict):
+        tmp = []
+        for j in range(len(locations)):
+            if j == i:
+                connectivity[i, j] = 1
+                #                 connectivity2[i,j] = 1
+                continue
+            p1 = np.asarray(avg_dict[key][0])
+            p2 = np.asarray(avg_dict[locations[j]][0])
+            dist = LA.norm(p1 - p2)
+            tmp.append(dist)
+            connectivity[i, j] = math.exp(-dist * 100)
+        # connectivity2[i,j] = math.exp(-(dist)**2)
+        #             print "Distance between region " + key + " and region " + locations[j] + " is: " + str(dist)
+        newmin = tmp.index(min(tmp))
+        if newmin >= i:
+            newmin += 1
+        # print "region " + key + " is closest to region " + locations[newmin] + "\n"
+        tmp2 = avg_dict.keys()[newmin]
+        Xe += [avg_dict[key][0][0], avg_dict[tmp2][0][0], None]
+        Ye += [avg_dict[key][0][1], avg_dict[tmp2][0][1], None]
+        Ze += [dictionary[key][0][2], dictionary[tmp2][0][2], None]
+
+    trace_edge = Scatter3d(x=Xe,
+                           y=Ye,
+                           z=Ze,
+                           mode='lines',
+                           line=Line(color='rgb(0,0,0)', width=3),
+                           hoverinfo='none'
+                           )
+
+    data.append(trace_edge)
+
+    layout = Layout(
+        paper_bgcolor='rgb(255,255,255)',
+        plot_bgcolor='rgb(255,255,255)'
+    )
+
+    fig = Figure(data=data, layout=layout)
+    # iplot(fig, validate=False)
+    plotly.offline.plot(fig, filename=outfile)
+    return connectivity
+
+
+def connectivity_heatmap(b_hat, outdir, token, num_points):
+    trace = Heatmap(z=b_hat)
+    data = [trace]
+    layout = Layout(title='Spectral Embedding Estimated Connectivity B_hat')
+    fig = Figure(data=data, layout=layout)
+    # iplot(fig, validate=False)
+    plotly.offline.plot(fig, filename=outdir + "/" + token + "_heatmap_est_connectivity_" + num_points + ".html")
+
+
+def estimate_connectivity(graphml, outdir, token, num_points):
+    print("Estimating connectivity...")
+    G = nx.read_graphml(graphml)
+
+    # generate adjacency matrix from networkx after removing edgeless nodes
+    # scipy sparse matrix
+    outdeg = G.degree()
+    to_keep = [n for n in outdeg if outdeg[n] != 0]
+    H = G.subgraph(to_keep)
+    A2 = nx.adjacency_matrix(H)
+
+    # use sklearn's implementation of spectral_embedding to calculate
+    # laplacian and obtain eigenvectors and eigenvalues from it
+    a2out = se(A2, n_components=3, drop_first=True)
+
+    nodelist = H.nodes()
+    se_regions = {}
+    for i, node in enumerate(nodelist):
+        reg = H.node[node]['region']
+        pos = a2out[i]
+        if str(reg) not in se_regions:
+            se_regions[str(reg)] = [pos]
+        else:
+            se_regions[str(reg)].append(pos)
+
+    connect = plot_connectivity(se_regions, outdir + "/" + token + "_spectral_embedding_" + num_points + ".html")
+    connectivity_heatmap(connect, outdir, token, num_points)
+    print("Finished estimating connectivity.")
+    return connect

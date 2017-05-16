@@ -12,7 +12,7 @@ import clarityviz as clv
 
 sys.path.insert(0, '../')
 
-def run_pipeline(token, resolution=5, points_path='', regis_path=''):
+def run_pipeline(token, resolution=5, num_points=10000, points_path='', regis_path=''):
     """
     Runs each individual part of the pipeline.
     :param token: Token name for REGISTERED brains in NeuroData.  (https://dev.neurodata.io/nd/ca/public_tokens/)
@@ -29,17 +29,29 @@ def run_pipeline(token, resolution=5, points_path='', regis_path=''):
         else:
             path = regis_path
         im = clv.analysis.apply_clahe(path);
-        output_ds = clv.analysis.downsample(im, num_points=10000);
-        clv.analysis.save_points(output_ds, "points/" + token + ".csv")
-        points_path = "points/" + token + ".csv";
-    clv.analysis.generate_pointcloud(points_path, "output/" + token + "_pointcloud.html");
+        output_ds = clv.analysis.downsample(im, num_points=num_points);
+        clv.analysis.save_points(output_ds, "points/" + token + "_" + num_points + ".csv")
+        points_path = "points/" + token + "_" + num_points + ".csv";
+
+    # Generating the pointcloud.
+    clv.analysis.generate_pointcloud(points_path, "output/" + token + "_pointcloud_" + num_points + ".html");
     # clv.analysis.get_atlas_annotate(save=True);
-    clv.analysis.get_regions(points_path, "atlas/ara3_annotation.nii", "points/" + token + "_regions.csv");
-    points_region_path = "points/" + token + "_regions.csv";
-    g = clv.analysis.create_graph(points_region_path, output_filename="graphml/" + token + "_graph.graphml");
-    clv.analysis.plot_graphml3d(g, output_path="output/" + token + "_edgegraph.html");
-    clv.analysis.generate_region_graph(token, points_region_path, output_path="output/" + token + "_regions.html");
-    clv.analysis.generate_density_graph(graph_path="graphml/" + token + "_graph.graphml", output_path="output/" + token + "_density.html", plot_title="False-Color Density of " + token);
+    # Generating the regions csv.
+    clv.analysis.get_regions(points_path, "atlas/ara3_annotation.nii", "points/" + token + "_regions_" + num_points + ".csv");
+    points_region_path = "points/" + token + "_regions_" + num_points + ".csv";
+
+    # Generating the graphml.
+    g = clv.analysis.create_graph(points_region_path, output_filename="graphml/" + token + "_graph_" + num_points + ".graphml");
+    # Generating the edge graph.
+    clv.analysis.plot_graphml3d(g, output_path="output/" + token + "_edgegraph_" + num_points + ".html");
+    # Generating the region graph.
+    clv.analysis.generate_region_graph(token, points_region_path, output_path="output/" + token + "_regions_" + num_points + ".html");
+    # Generating the density graph + density heatmap.
+    clv.analysis.generate_density_graph(graph_path="graphml/" + token + "_graph_" + num_points + ".graphml", output_path="output/" + token + "_density_" + num_points + ".html", plot_title="False-Color Density of " + token);
+    # Generating scaled centroids graph.
+    clv.analysis.generate_scaled_centroids_graph(token, points_path, output_path='output/' + token + '_centroids_' + num_points + '.html')
+    # Generating the two connectivity things.
+    clv.connectivity.estimate_connectivity("graphml/"+token+"_graph_"+num_points+".graphml", 'output', token, num_points)
     print("Completed pipeline...!")
 
 if __name__ == "__main__":
