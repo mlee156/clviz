@@ -1,15 +1,15 @@
-import boto3
-import boto3.s3.connection
+import boto
+import boto.s3.connection
 access_key = 'put your access key here!'
 secret_key = 'put your secret key here!'
 
 def get_buckets(access_key, secret_key):
-    conn = boto3.connect_s3(
+    conn = boto.connect_s3(
         aws_access_key_id = access_key,
         aws_secret_access_key = secret_key,
         host = 'objects.dreamhost.com',
         #is_secure=False,               # uncomment if you are not using ssl
-        calling_format = boto3.s3.connection.OrdinaryCallingFormat(),
+        calling_format = boto.s3.connection.OrdinaryCallingFormat(),
         )
     for bucket in conn.get_all_buckets():
         print "{name}\t{created}".format(
@@ -18,12 +18,12 @@ def get_buckets(access_key, secret_key):
         )
 
 def get_contents(bucket_name):
-    conn = boto3.connect_s3(
+    conn = boto.connect_s3(
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_key,
         host='objects.dreamhost.com',
         # is_secure=False,               # uncomment if you are not using ssl
-        calling_format=boto3.s3.connection.OrdinaryCallingFormat(),
+        calling_format=boto.s3.connection.OrdinaryCallingFormat(),
     )
     bucket = conn.lookup('clviz-bucket')
 
