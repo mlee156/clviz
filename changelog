@@ -69,3 +69,6 @@
 
 ### Improved
 - changed downsample() function in analysis.py to extract_bright_points() and added bp_percentile parameter.
+
+### Added
+- connectivity estimation code

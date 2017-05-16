@@ -1,4 +1,4 @@
 from .analysis import *
 from .connectivity import *
 
-version = "0.1.6"
+version = "0.1.7"
