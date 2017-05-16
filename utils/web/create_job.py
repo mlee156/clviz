@@ -117,7 +117,7 @@ def create_env():
 #     return seshs
 
 
-def create_json(bucket, jobdir, token, credentials=None, log=False):
+def create_json(bucket, jobdir, token, num_points, credentials=None, log=False):
     """
     Takes parameters to make jsons
     """
@@ -156,10 +156,12 @@ def create_json(bucket, jobdir, token, credentials=None, log=False):
     jobs = list()
     # set bucket
     cmd[0] = re.sub('(<BUCKET>)', bucket, cmd[0])
-    # set path
+    # set token
     cmd[1] = re.sub('(<TOKEN>)', token, cmd[1])
+    # set num points
+    cmd[2] = re.sub('(<NUMPOINTS>)', str(num_points), cmd[2])
 
-    name = 'clviz_token-{}'.format(token)
+    name = 'clviz_token-{0}-numpoints-{1}'.format(token, num_points)
     job_json = deepcopy(template)
     job_json['jobName'] = name
     job_json['containerOverrides']['command'] = cmd
@@ -214,12 +216,14 @@ def main():
                         help='The S3 bucket with the input dataset formatted according to the BIDS standard.')
     parser.add_argument('--credentials', help='AWS formatted csv of credentials.')
     parser.add_argument('--token', help='The token of the brain of interest.')
+    parser.add_argument('--num-points', help='The desired number of points.')
     result = parser.parse_args()
 
     # convert args to objs
     bucket = str(result.bucket)
     credentials = str(result.credentials)
     token = str(result.token)
+    num_points = int(result.num_points)
 
     # extract credentials
     credfile = open(credentials, 'rb')
@@ -247,7 +251,7 @@ def main():
     create_env()
     # for obj in ["input.txt"]:# s3_bucket.objects.all():
     # threads = crawl_bucket(bucket, dataset)
-    jobs = create_json(bucket, "to_exec", token, credentials=credentials, log=False)
+    jobs = create_json(bucket, "to_exec", token, num_points, credentials=credentials, log=False)
     submit_jobs(jobs, "to_exec")
 
 

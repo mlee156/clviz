@@ -1,0 +1,1 @@
+{"parameters": {}, "jobDefinition": "clviz-pipeline", "jobQueue": "clviz-queue", "jobName": "clviz_token-test-numpoints-3000", "containerOverrides": {"environment": [{"name": "AWS_ACCESS_KEY_ID", "value": "AKIAJRU3L4PSG6OGA7PQ"}, {"name": "AWS_SECRET_ACCESS_KEY", "value": "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"}], "command": ["clviz-bucket", "test", "3000"]}, "dependsOn": []}
