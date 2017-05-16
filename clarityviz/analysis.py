@@ -368,14 +368,19 @@ def run_pipeline(token, resolution=5, num_points, points_path='', regis_path='')
         output_ds = extract_bright_points(im, num_points=num_points);
         save_points(output_ds, "points/" + token + ".csv")
         points_path = "points/" + token + ".csv";
-    generate_pointcloud(points_path, "output/" + token + "_pointcloud.html");
+    # Generating point cloud
+    generate_pointcloud(points_path, "output/" + token + "_pointcloud_" + num_points + ".html");
     get_atlas_annotate(save=True);
     get_regions(points_path, "atlas/ara3_annotation.nii", "points/" + token + "_regions.csv");
     points_region_path = "points/" + token + "_regions.csv";
+
     g = create_graph(points_region_path, output_filename="graphml/" + token + "_graph.graphml");
-    plot_graphml3d(g, output_path="output/" + token + "_edgegraph.html");
-    generate_region_graph(token, points_region_path, output_path="output/" + token + "_regions.html");
-    generate_density_graph(graph_path="graphml/" + token + "_graph.graphml", output_path="output/" + token + "_density.html", plot_title="False-Color Density of " + token);
+    # Generating edge graph
+    plot_graphml3d(g, output_path="output/" + token + "_edgegraph_" + num_points + ".html");
+    # Generating region graph.
+    generate_region_graph(token, points_region_path, output_path="output/" + token + "_regions_" + num_points + ".html");
+    # Generating density graph + density heatmap
+    generate_density_graph(graph_path="graphml/" + token + "_graph.graphml", output_path="output/" + token + "_density_" + num_points + ".html", plot_title="False-Color Density of " + token);
     print("Completed pipeline...!")
 
 def save_points(points, output_path):
