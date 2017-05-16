@@ -288,28 +288,26 @@ def apply_clahe(input_path):
     return im_clahe
 
 
-def downsample(im, num_points=10000, optimize=True):
+def extract_bright_points(im, num_points=10000, bp_percentile=0.75, optimize=True):
     """
     Function to extract points data from a np array representing a brain (i.e. an object loaded
     from a .nii file).
     :param im: The image array.
     :param num_points: The desired number of points to be downsampled to.
+    :param bp_percentile: The bright points percentile.
     :param optimize:
     :return: The bright points in a np array.
     """
     # obtaining threshold
-    percentile = 0.4
     (values, bins) = np.histogram(im, bins=1000)
     cumValues = np.cumsum(values).astype(float)
     cumValues = (cumValues - cumValues.min()) / cumValues.ptp()
 
-    maxIndex = np.argmax(cumValues > percentile) - 1
+    maxIndex = np.argmax(cumValues > bp_percentile) - 1
     threshold = bins[maxIndex]
     print(threshold)
 
     total = im.shape[0] * im.shape[1] * im.shape[2]
-    #     print("Coverting to points...\ntoken=%s\ntotal=%d\nmax=%f\nthreshold=%f\nnum_points=%d" \
-    #           %(self._token,total,self._max,threshold,num_points))
     print("(This will take couple minutes)")
     # threshold
     im_max = np.max(im)
@@ -335,30 +333,22 @@ def downsample(im, num_points=10000, optimize=True):
         raise ValueError("Number of points given should be at most equal to total points: %d" % total_points)
     fraction = num_points / float(total_points)
 
-    if fraction < 1.0:
-        # np.random.random returns random floats in the half-open interval [0.0, 1.0)
-        filt = np.random.random(size=l) < fraction
-        print('v.shape:')
-        print(l)
-        #         print('x.size before downsample: %d' % x.size)
-        #         print('y.size before downsample: %d' % y.size)
-        #         print('z.size before downsample: %d' % z.size)
-        print('v.size before downsample: %d' % v.size)
-        x = x[filt]
-        y = y[filt]
-        z = z[filt]
-        v = v[filt]
-        #         print('x.size after downsample: %d' % x.size)
-        #         print('y.size after downsample: %d' % y.size)
-        #         print('z.size after downsample: %d' % z.size)
-        print('v.size after downsample: %d' % v.size)
     points = np.vstack([x, y, z, v])
     points = np.transpose(points)
-    print("Output num points: %d" % (points.shape[0]))
+
+    # reverse sorting (high to low) by the 4th column, brightness
+    points = points[points[:,3].argsort()[::-1]]
+    print("post percentile threshold num points: %d" % (points.shape[0]))
+
+    # if number of bright points is > than num_points requested, curtail the array
+    if len(points) > num_points:
+        points = points[0:num_points]
+
+    print("final num points: %d" % (points.shape[0]))
     print("Finished")
     return points
 
-def run_pipeline(token, resolution=5, points_path='', regis_path=''):
+def run_pipeline(token, resolution=5, num_points, points_path='', regis_path=''):
     """
     Runs each individual part of the pipeline.
     :param token: Token name for REGISTERED brains in NeuroData.  (https://dev.neurodata.io/nd/ca/public_tokens/)
@@ -375,7 +365,7 @@ def run_pipeline(token, resolution=5, points_path='', regis_path=''):
         else:
             path = regis_path
         im = apply_clahe(path);
-        output_ds = downsample(im, num_points=10000);
+        output_ds = extract_bright_points(im, num_points=num_points);
         save_points(output_ds, "points/" + token + ".csv")
         points_path = "points/" + token + ".csv";
     generate_pointcloud(points_path, "output/" + token + "_pointcloud.html");
@@ -429,7 +419,7 @@ def generate_pointcloud(points_path, output_path):
         z = [x for x in thedata['c']],
         mode='markers',
         marker=dict(
-            size=1.2,
+            size=3,
             color='cyan',                # set color to an array/list of desired values
             colorscale='Viridis',   # choose a colorscale
             opacity=0.15

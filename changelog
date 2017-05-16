@@ -62,3 +62,10 @@
 
 ### Improved
 - bugfixes
+
+# 0.1.7
+
+5/15/17
+
+### Improved
+- changed downsample() function in analysis.py to extract_bright_points() and added bp_percentile parameter.
