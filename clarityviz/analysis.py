@@ -345,7 +345,7 @@ def extract_bright_points(im, num_points=10000, bp_percentile=0.75, optimize=Tru
         points = points[0:num_points]
 
     print("final num points: %d" % (points.shape[0]))
-    print("Finished")
+    print("Finished extracting bright points.")
     return points
 
 def run_pipeline(token, resolution=5, num_points=10000, points_path='', regis_path=''):
