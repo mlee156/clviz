@@ -48,7 +48,7 @@ def run_pipeline(token, resolution=5, num_points=10000, points_path='', regis_pa
     # Generating the density graph + density heatmap.
     clv.analysis.generate_density_graph(graph_path="graphml/" + token + "_graph_" + str(num_points) + ".graphml", output_path="output/" + token + "_density_" + str(num_points) + ".html", plot_title="False-Color Density of " + token);
     # Generating scaled centroids graph.
-    clv.analysis.generate_scaled_centroids_graph(token, points_path, output_path='output/' + token + '_centroids_' + str(num_points) + '.html')
+    clv.analysis.generate_scaled_centroids_graph(token, points_region_path, output_path='output/' + token + '_centroids_' + str(num_points) + '.html')
     # Generating the two connectivity things.
     clv.connectivity.estimate_connectivity("graphml/"+token+"_graph_"+str(num_points)+".graphml", 'output', token, num_points)
     print("Completed pipeline...!")
